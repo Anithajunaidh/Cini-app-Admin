@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
 import { routing } from '@/libs/I18nRouting';
 import '@/styles/global.css';
+import { QueryProvider } from '@/lib/providers/query-provider';
 
 export const metadata: Metadata = {
   icons: [
@@ -55,11 +56,13 @@ export default async function RootLayout(props: {
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
-          {props.children}
+        <QueryProvider>
+          <NextIntlClientProvider>
+            {props.children}
 
-          <DemoBadge />
-        </NextIntlClientProvider>
+            <DemoBadge />
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );
