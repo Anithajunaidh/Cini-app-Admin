@@ -1,11 +1,32 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import { normalizeApiError } from "./errors";
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import { normalizeApiError } from './errors';
+import type { ApiErrorResponse } from './errors';
 
+function getAccessToken(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return localStorage.getItem('access_token');
+}
+
+async function refreshAccessToken() {
+  // call refresh endpoint, store new token
+}
+
+function handleLogout() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('access_token');
+    window.location.href = '/login';
+  }
+}
+
+// eslint-disable-next-line import/no-named-as-default-member
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  timeout: 15000,
+  timeout: 15_000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -18,44 +39,36 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  // eslint-disable-next-line promise/prefer-await-to-callbacks
+  (error) => {
+    throw error;
+  },
 );
 
 // ---- RESPONSE INTERCEPTOR ----
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+  // eslint-disable-next-line promise/prefer-await-to-callbacks
+  async (error: AxiosError<ApiErrorResponse>) => {
+    const originalRequest = error.config;
 
     // Example: auto-refresh token on 401, retry once
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (
+      originalRequest &&
+      error.response?.status === 401 &&
+      Reflect.get(originalRequest, '_retry') !== true
+    ) {
+      Reflect.set(originalRequest, '_retry', true);
       try {
         await refreshAccessToken(); // implement per your auth strategy
-        return apiClient(originalRequest);
-      } catch (refreshError) {
+        return await apiClient(originalRequest);
+      } catch {
         handleLogout(); // clear session, redirect to /login
-        return Promise.reject(normalizeApiError(error));
+        throw normalizeApiError(error);
       }
     }
 
     // Every other error is normalized here, ONCE, centrally.
-    return Promise.reject(normalizeApiError(error));
-  }
+    throw normalizeApiError(error);
+  },
 );
-
-function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("access_token");
-}
-
-async function refreshAccessToken() {
-  // call refresh endpoint, store new token
-}
-
-function handleLogout() {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("access_token");
-    window.location.href = "/login";
-  }
-}
