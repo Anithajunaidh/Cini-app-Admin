@@ -2,17 +2,7 @@ import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
   // Files to exclude from Knip analysis
-  ignore: [
-    'checkly.config.ts',
-    'src/libs/I18n.ts',
-    'src/types/I18n.ts',
-    'src/features/test-users/api.ts',
-    'src/features/test-users/types.ts',
-    'src/lib/api/client.ts',
-    'src/lib/api/endpoints.ts',
-    'src/lib/query/query-keys.ts',
-    'src/lib/api/errors.ts'
-  ],
+  ignore: ['checkly.config.ts', 'src/libs/I18n.ts', 'src/types/I18n.ts'],
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     '@clerk/shared',
