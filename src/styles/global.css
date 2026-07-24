@@ -1,3 +1,104 @@
 @layer theme, base, clerk, components, utilities; /* Ensure Clerk is compatible with Tailwind CSS v4 */
 
 @import 'tailwindcss';
+
+:root {
+  /* Surfaces */
+  --bg-deep: #0f1720;
+  --surface: #172230;
+  --surface-raised: #1f2d3d;
+  --surface-hover: #24344680;
+
+  /* Borders */
+  --border: #263444;
+  --border-soft: #1d2a38;
+
+  /* Text */
+  --text-primary: #e8edf2;
+  --text-muted: #8ca0b3;
+  --text-faint: #526376;
+
+  /* Accents */
+  --accent-amber: #f0a84b;
+  --accent-amber-dim: #f0a84b26;
+  --accent-teal: #4fd1c5;
+  --accent-teal-dim: #4fd1c526;
+  --accent-red: #e5646a;
+  --accent-red-dim: #e5646a22;
+
+  /* Shape */
+  --radius: 10px;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+/* ============================================================
+   Base Reset
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Reduced Motion — Accessibility
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================
+   PulseDot Keyframes
+   ============================================================ */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  80% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
