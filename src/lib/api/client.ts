@@ -47,7 +47,8 @@ apiClient.interceptors.request.use(
 
 // ---- RESPONSE INTERCEPTOR ----
 apiClient.interceptors.response.use(
-  (response) => response,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  (response) => response.data,
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config;
