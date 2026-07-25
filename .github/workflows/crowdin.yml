@@ -19,6 +19,8 @@ jobs:
       - name: Crowdin action
         uses: crowdin/github-action@v2
         with:
+          api_token: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          project_id: ${{ secrets.CROWDIN_PROJECT_ID }}
           upload_sources: true
           upload_translations: true
           download_translations: true
@@ -30,5 +32,3 @@ jobs:
           commit_message: 'chore: new Crowdin translations by GitHub Action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

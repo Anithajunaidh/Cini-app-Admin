@@ -1,17 +1,54 @@
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import process from 'node:process';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const rootDir = process.cwd();
 const pgliteServerBin = path.join(rootDir, 'node_modules', '@electric-sql', 'pglite-socket', 'dist', 'scripts', 'server.js');
 const drizzleBin = path.join(rootDir, 'node_modules', 'drizzle-kit', 'bin.cjs');
 const nextBin = path.join(rootDir, 'node_modules', 'next', 'dist', 'bin', 'next');
 
-const env = { ...process.env };
+function readEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return {};
+  }
+
+  const parsed = {};
+  const contents = fs.readFileSync(filePath, 'utf8');
+
+  for (const line of contents.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+
+    const separatorIndex = trimmed.indexOf('=');
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, separatorIndex).trim();
+    let value = trimmed.slice(separatorIndex + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (key) {
+      parsed[key] = value;
+    }
+  }
+
+  return parsed;
+}
+
+const env = {
+  ...readEnvFile(path.join(rootDir, '.env')),
+  ...process.env,
+};
 const children = [];
 
 function startProcess(command, args, extraEnv = {}) {
