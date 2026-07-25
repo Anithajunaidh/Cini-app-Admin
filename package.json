@@ -6,6 +6,7 @@
     "dev:spotlight": "npx @spotlightjs/spotlight",
     "dev:next": "next dev",
     "dev": "run-p db-server:file dev:*",
+    "dev:test": "node scripts/playwright-webserver.mjs",
     "build:next": "next build",
     "build-local": "run-p db-server:memory build:next --race",
     "build": "run-s db:migrate build:next",

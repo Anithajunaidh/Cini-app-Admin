@@ -1,21 +1,15 @@
 import type { Metadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 };
 
-export async function generateMetadata(props: DashboardLayoutProps): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'DashboardLayout',
-  });
-
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: t('meta_title'),
-    description: t('meta_description'),
+    title: 'Dashboard',
+    description: 'Manage your account from the dashboard.',
   };
 }
 
