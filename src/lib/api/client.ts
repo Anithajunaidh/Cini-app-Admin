@@ -19,7 +19,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-   async (error) => Promise.reject(error),
+  async (error) => { throw error; },
 );
 
 // ---- RESPONSE INTERCEPTOR ----
@@ -43,7 +43,9 @@ apiClient.interceptors.response.use(
 );
 
 function getAccessToken(): string | null {
-  if (typeof window === 'undefined') {return null;}
+  if (typeof window === 'undefined') {
+    return null;
+  }
   return localStorage.getItem('access_token');
 }
 

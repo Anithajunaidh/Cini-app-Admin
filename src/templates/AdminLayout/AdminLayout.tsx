@@ -13,7 +13,7 @@ type AdminLayoutProps = {
   adminName?: string;
   adminRole?: string;
   badges?: Record<string, number>;
-}
+};
 
 /**
  * Shell template that every admin page renders inside.
@@ -39,7 +39,9 @@ export function AdminLayout(props: AdminLayoutProps) {
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => { window.removeEventListener('resize', handleResize); };
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
@@ -48,7 +50,9 @@ export function AdminLayout(props: AdminLayoutProps) {
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-[#0f1720]/80 backdrop-blur-sm md:hidden"
-          onClick={() => { setIsMobileMenuOpen(false); }}
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+          }}
         />
       )}
 
@@ -73,7 +77,9 @@ export function AdminLayout(props: AdminLayoutProps) {
           adminName={props.adminName}
           adminRole={props.adminRole}
           badges={props.badges}
-          onNavClick={() => { setIsMobileMenuOpen(false); }}
+          onNavClick={() => {
+            setIsMobileMenuOpen(false);
+          }}
           collapsed={isCollapsed}
         />
       </div>
@@ -86,11 +92,20 @@ export function AdminLayout(props: AdminLayoutProps) {
           <button
             id="mobile-menu-open"
             type="button"
-            onClick={() => { setIsMobileMenuOpen(true); }}
+            onClick={() => {
+              setIsMobileMenuOpen(true);
+            }}
             className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             aria-label="Open navigation menu"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -105,7 +120,6 @@ export function AdminLayout(props: AdminLayoutProps) {
             </div>
           </div>
         </div>
-
 
         <SyncPulseStrip />
         <Topbar eyebrow={props.eyebrow} title={props.title} />

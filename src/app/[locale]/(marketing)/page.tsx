@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 
 type IndexPageProps = {
   params: Promise<{ locale: string }>;

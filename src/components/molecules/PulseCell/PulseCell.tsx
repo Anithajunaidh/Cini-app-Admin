@@ -4,7 +4,7 @@ type PulseCellProps = {
   title: string;
   value: string;
   color: 'teal' | 'amber';
-}
+};
 
 /** One data cell in the Sync Pulse strip (dot + label + value). Server Component. */
 export function PulseCell(props: PulseCellProps) {

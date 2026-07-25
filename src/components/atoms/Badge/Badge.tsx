@@ -12,7 +12,7 @@ export type BadgeVariant =
 type BadgeProps = {
   variant: BadgeVariant;
   children: ReactNode;
-}
+};
 
 const variantStyles: Record<BadgeVariant, string> = {
   reported: 'bg-[var(--accent-amber-dim)] text-[var(--accent-amber)]',

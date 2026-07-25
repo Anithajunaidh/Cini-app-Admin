@@ -10,7 +10,9 @@ export function makeQueryClient() {
         retry: (failureCount, error) => {
           const apiError = error as ApiError;
           // Don't retry client errors (4xx)
-          if (apiError?.status >= 400 && apiError?.status < 500) {return false;}
+          if (apiError?.status >= 400 && apiError?.status < 500) {
+            return false;
+          }
           return failureCount < 2;
         },
         refetchOnWindowFocus: false,

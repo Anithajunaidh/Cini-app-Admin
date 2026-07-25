@@ -7,7 +7,7 @@ import { makeQueryClient } from '@/lib/query/query-client';
 
 type QueryProviderProps = {
   children: React.ReactNode;
-}
+};
 
 /** Wraps the app with React Query context. Must be a Client Component. */
 export function QueryProvider(props: QueryProviderProps) {

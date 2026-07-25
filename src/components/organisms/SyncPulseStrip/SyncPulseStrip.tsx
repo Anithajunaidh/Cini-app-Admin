@@ -9,22 +9,30 @@ import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
  * - Availability: teal if last sync < 24h ago, amber otherwise
  */
 function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
-  if (!isoString) {return 'amber';}
+  if (!isoString) {
+    return 'amber';
+  }
   const ageMs = Date.now() - new Date(isoString).getTime();
   return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
-  if (epochSeconds == null) {return 'amber';}
+  if (epochSeconds == null) {
+    return 'amber';
+  }
   const ageMs = Date.now() - epochSeconds * 1000;
   return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function formatRelativeTime(ms: number): string {
   const minutes = Math.floor(ms / 60_000);
-  if (minutes < 60) {return `${minutes}m ago`;}
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) {return `${hours}h ago`;}
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
   return `${Math.floor(hours / 24)}d ago`;
 }
 

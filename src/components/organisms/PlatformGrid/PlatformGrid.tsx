@@ -41,7 +41,9 @@ export function PlatformGrid() {
         {/* Dashed "Add platform" card */}
         <button
           type="button"
-          onClick={() =>{  setIsModalOpen(true); }}
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
           className="flex min-h-[130px] flex-col items-center justify-center gap-[6px] rounded-[var(--radius)] border border-dashed border-[var(--border)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-faint)] transition-[color,border-color] duration-150 hover:border-[var(--accent-teal)] hover:text-[var(--accent-teal)]"
           aria-label="Add a new platform"
         >
@@ -60,7 +62,13 @@ export function PlatformGrid() {
         </button>
       </div>
 
-      {isModalOpen && <AddPlatformModal onClose={() =>{  setIsModalOpen(false); }} />}
+      {isModalOpen && (
+        <AddPlatformModal
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 }

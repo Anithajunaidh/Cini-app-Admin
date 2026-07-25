@@ -5,7 +5,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 type GhostButtonProps = {
   danger?: boolean;
   children: ReactNode;
-} & ButtonHTMLAttributes<HTMLButtonElement>
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
  * Transparent bordered button. `danger` variant turns red on hover;

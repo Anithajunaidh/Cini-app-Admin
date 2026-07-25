@@ -13,7 +13,7 @@ type PulseDotProps = {
   color: 'teal' | 'amber';
   /** 14 for the Sync Pulse strip, 16 for Sync Status detail cards. */
   size?: 14 | 16;
-}
+};
 
 const colorStyles = {
   teal: {

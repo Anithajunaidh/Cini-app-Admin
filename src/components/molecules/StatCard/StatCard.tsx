@@ -3,7 +3,7 @@ type StatCardProps = {
   value: string | number;
   caption: string;
   amber?: boolean;
-}
+};
 
 /** Single stat card in the Dashboard stats grid. */
 export function StatCard(props: StatCardProps) {

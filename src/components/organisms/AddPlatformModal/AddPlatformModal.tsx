@@ -7,7 +7,7 @@ import type { ApiError } from '@/lib/api/errors';
 
 type AddPlatformModalProps = {
   onClose: () => void;
-}
+};
 
 /** Modal form for creating a new streaming platform. */
 export function AddPlatformModal(props: AddPlatformModalProps) {
@@ -90,7 +90,9 @@ export function AddPlatformModal(props: AddPlatformModalProps) {
               id="platform-name"
               type="text"
               value={name}
-              onChange={(e) =>{  setName(e.target.value); }}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
               placeholder="e.g. Prime Video"
               className="rounded-[8px] border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent-teal)] focus:outline-none"
             />
@@ -107,7 +109,9 @@ export function AddPlatformModal(props: AddPlatformModalProps) {
               id="platform-slug"
               type="text"
               value={slug}
-              onChange={(e) =>{  setSlug(e.target.value); }}
+              onChange={(e) => {
+                setSlug(e.target.value);
+              }}
               placeholder="e.g. prime-video"
               className="rounded-[8px] border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 font-[family-name:var(--font-mono)] text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent-teal)] focus:outline-none"
             />

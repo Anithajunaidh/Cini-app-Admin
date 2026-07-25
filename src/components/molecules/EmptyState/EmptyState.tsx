@@ -1,7 +1,7 @@
 type EmptyStateProps = {
   title: string;
   sub?: string;
-}
+};
 
 /** Centered empty state block. Reuse for any "no data" scenario. */
 export function EmptyState(props: EmptyStateProps) {

@@ -3,7 +3,7 @@ import type { AdminPlatformDto } from '@/features/admin/types';
 
 type PlatformCardProps = {
   platform: AdminPlatformDto;
-}
+};
 
 /** Single platform card with name, slug, status badge, and subscriber/title metrics. */
 export function PlatformCard(props: PlatformCardProps) {

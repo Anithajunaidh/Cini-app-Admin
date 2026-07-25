@@ -6,7 +6,7 @@ type PanelProps = {
   filterRow?: ReactNode;
   footer?: ReactNode;
   children: ReactNode;
-}
+};
 
 /** Generic card/panel wrapper used for tables and list sections. Server Component. */
 export function Panel(props: PanelProps) {

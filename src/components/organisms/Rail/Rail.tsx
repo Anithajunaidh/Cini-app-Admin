@@ -9,12 +9,12 @@ type NavItem = {
   view: string;
   badge?: number;
   icon: React.ReactNode;
-}
+};
 
 type NavGroup = {
   eyebrow: string;
   items: NavItem[];
-}
+};
 
 const navGroups: NavGroup[] = [
   {
@@ -165,7 +165,7 @@ type RailProps = {
   onNavClick?: () => void;
   /** When true, renders icon-only mode (no labels, narrower width). Used at md breakpoint. */
   collapsed?: boolean;
-}
+};
 
 /** Fixed sidebar rail with brand, nav groups, and admin user block. */
 export function Rail(props: RailProps) {
@@ -212,7 +212,7 @@ export function Rail(props: RailProps) {
                   ].join(' ')}
                   aria-current={active ? 'page' : undefined}
                 >
-                  <span className="shrink-0 opacity-90 [&>svg]:w-5 [&>svg]:h-5">{item.icon}</span>
+                  <span className="shrink-0 opacity-90 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
                   {badge !== undefined && (
                     <span className="absolute -top-[3px] -right-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
                       {badge > 9 ? '9+' : badge}
