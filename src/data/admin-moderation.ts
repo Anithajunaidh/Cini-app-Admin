@@ -28,9 +28,6 @@ export interface AdminAvailabilityReport {
 export type CommentFilter = 'reported' | 'hidden' | 'all';
 export type AvailabilityFilter = 'unresolved' | 'resolved' | 'all';
 
-const COMMENT_LIMIT = 5;
-const REPORT_LIMIT = 5;
-
 export const adminCommentQueue = commentQueueData as AdminComment[];
 export const adminAvailabilityReports = availabilityReportsData as AdminAvailabilityReport[];
 
@@ -56,10 +53,6 @@ export function getAvailabilityReportCounts() {
   };
 }
 
-export function getCommentQueueRows(filter: CommentFilter, page: number) {
-  return paginate(filterCommentQueueRows(adminCommentQueue, filter), page, COMMENT_LIMIT);
-}
-
 export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilter) {
   return rows
     .slice()
@@ -79,10 +72,6 @@ export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilt
     });
 }
 
-export function getAvailabilityReportRows(filter: AvailabilityFilter, page: number) {
-  return paginate(filterAvailabilityReportsRows(adminAvailabilityReports, filter), page, REPORT_LIMIT);
-}
-
 export function filterAvailabilityReportsRows(rows: AdminAvailabilityReport[], filter: AvailabilityFilter) {
   return rows
     .slice()
@@ -100,29 +89,4 @@ export function filterAvailabilityReportsRows(rows: AdminAvailabilityReport[], f
     .sort(function(left, right) {
       return new Date(right.reportedAt).getTime() - new Date(left.reportedAt).getTime();
     });
-}
-
-export function getCommentQueueTotal(filter: CommentFilter) {
-  return getCommentQueueRows(filter, 1).total;
-}
-
-export function getAvailabilityReportTotal(filter: AvailabilityFilter) {
-  return getAvailabilityReportRows(filter, 1).total;
-}
-
-function paginate<T>(items: T[], page: number, limit: number) {
-  const safePage = page < 1 ? 1 : page;
-  const total = items.length;
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const resolvedPage = safePage > totalPages ? totalPages : safePage;
-  const start = (resolvedPage - 1) * limit;
-  const rows = items.slice(start, start + limit);
-
-  return {
-    rows,
-    total,
-    totalPages,
-    page: resolvedPage,
-    limit,
-  };
 }
