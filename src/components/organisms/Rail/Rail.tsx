@@ -1,32 +1,30 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import {
-  getAvailabilityReportCounts,
-  getCommentQueueCounts,
-} from '@/data/admin-moderation';
+import { Link } from '@/libs/I18nNavigation';
 
-interface NavItemConfig {
+type NavItem = {
   label: string;
   href: string;
-  icon: React.ReactNode;
-  badgeCount?: number;
-}
+  view: string;
+  badge?: number;
+  icon: ReactNode;
+};
 
-interface NavGroupConfig {
+type NavGroup = {
   eyebrow: string;
-  items: NavItemConfig[];
-}
+  items: NavItem[];
+};
 
-const navGroups: NavGroupConfig[] = [
+const navGroups: NavGroup[] = [
   {
     eyebrow: 'Overview',
     items: [
       {
         label: 'Dashboard',
         href: '/dashboard',
+        view: 'dashboard',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="3" width="7" height="9" rx="1.5" />
@@ -44,6 +42,7 @@ const navGroups: NavGroupConfig[] = [
       {
         label: 'Comment queue',
         href: '/dashboard/comments',
+        view: 'comments',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 12a8 8 0 1 1-3.5-6.6" />
@@ -54,6 +53,7 @@ const navGroups: NavGroupConfig[] = [
       {
         label: 'Availability reports',
         href: '/dashboard/reports',
+        view: 'reports',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 9v4" />
@@ -70,6 +70,7 @@ const navGroups: NavGroupConfig[] = [
       {
         label: 'Platforms',
         href: '/dashboard/platforms',
+        view: 'platforms',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="4" width="18" height="14" rx="2" />
@@ -80,6 +81,7 @@ const navGroups: NavGroupConfig[] = [
       {
         label: 'Sync status',
         href: '/dashboard/sync',
+        view: 'sync',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 2v6h-6" />
@@ -97,6 +99,7 @@ const navGroups: NavGroupConfig[] = [
       {
         label: 'Users',
         href: '/dashboard/users',
+        view: 'users',
         icon: (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -110,85 +113,143 @@ const navGroups: NavGroupConfig[] = [
   },
 ];
 
-export function Rail() {
+type RailProps = {
+  adminName?: string;
+  adminRole?: string;
+  badges?: Record<string, number>;
+  onNavClick?: () => void;
+  collapsed?: boolean;
+};
+
+export function Rail(props: RailProps) {
   const pathname = usePathname();
-  const commentQueueCounts = getCommentQueueCounts();
-  const availabilityReportCounts = getAvailabilityReportCounts();
 
-  const normalizedPath = pathname.replace(/^\/[a-z]{2}(?=\/)/, '');
+  function isActive(href: string) {
+    return pathname.includes(href);
+  }
 
-  const groupsWithCounts = navGroups.map(function(group) {
-    if (group.eyebrow === 'Moderation') {
-      return {
-        ...group,
-        items: group.items.map(function(item) {
-          if (item.label === 'Comment queue') {
-            return {
-              ...item,
-              badgeCount: commentQueueCounts.reported,
-            };
-          }
+  const adminInitials = (props.adminName ?? 'Admin')
+    .split(' ')
+    .map((name) => name[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
-          if (item.label === 'Availability reports') {
-            return {
-              ...item,
-              badgeCount: availabilityReportCounts.unresolved,
-            };
-          }
+  if (props.collapsed) {
+    return (
+      <aside className="sticky top-0 flex h-screen flex-col items-center gap-[6px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[10px] py-[22px]">
+        <div className="mb-4 flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[var(--accent-teal)] to-[#2E7D74] font-[family-name:var(--font-mono)] text-[15px] font-semibold text-[#06231F]">
+          M
+        </div>
 
-          return item;
-        }),
-      };
-    }
+        <nav className="flex w-full flex-col items-center gap-[2px]" aria-label="Main navigation">
+          {navGroups.map((group) =>
+            group.items.map((item) => {
+              const active = isActive(item.href);
+              const badge = props.badges?.[item.view];
 
-    return group;
-  });
+              return (
+                <Link
+                  key={item.view}
+                  href={item.href as any}
+                  onClick={() => props.onNavClick?.()}
+                  title={item.label}
+                  className={[
+                    'relative flex h-[44px] w-[44px] items-center justify-center rounded-[10px]',
+                    'border transition-[background,color] duration-150',
+                    active
+                      ? 'border-[#4FD1C540] bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]'
+                      : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+                  ].join(' ')}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span className="shrink-0 opacity-90 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
+                  {badge !== undefined ? (
+                    <span className="absolute -right-[3px] -top-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            }),
+          )}
+        </nav>
+
+        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px]">
+          <div
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)]"
+            title={props.adminName ?? 'Admin'}
+          >
+            {adminInitials}
+          </div>
+        </div>
+      </aside>
+    );
+  }
 
   return (
-    <aside className="rail">
-      <div className="rail-brand">
-        <div className="rail-mark">M</div>
-        <div>
-          <div className="rail-brand-text">MIRALO</div>
-          <div className="rail-brand-sub">Backoffice</div>
+    <aside className="sticky top-0 flex h-screen flex-col gap-[26px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[14px] py-[22px]">
+      <div className="flex items-center gap-[10px] px-2">
+        <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[var(--accent-teal)] to-[#2E7D74] font-[family-name:var(--font-mono)] text-[13px] font-semibold text-[#06231F]">
+          M
+        </div>
+        <div className="min-w-0">
+          <div className="font-[family-name:var(--font-display)] text-[15px] font-semibold tracking-[0.2px]">
+            MIRALO
+          </div>
+          <div className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.6px] text-[var(--text-faint)]">
+            Backoffice
+          </div>
         </div>
       </div>
 
-      <nav className="rail-nav">
-        {groupsWithCounts.map(function(group) {
-          return (
-            <React.Fragment key={group.eyebrow}>
-              <div className="rail-eyebrow">{group.eyebrow}</div>
-              {group.items.map(function(item) {
-                const isActive =
-                  normalizedPath === item.href ||
-                  (item.href !== '/dashboard' && normalizedPath.startsWith(item.href));
+      <nav className="flex flex-col gap-[2px]" aria-label="Main navigation">
+        {navGroups.map((group) => (
+          <div key={group.eyebrow}>
+            <div className="px-[10px] pb-[6px] pt-[14px] font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[1.2px] text-[var(--text-faint)]">
+              {group.eyebrow}
+            </div>
+            {group.items.map((item) => {
+              const active = isActive(item.href);
+              const badge = props.badges?.[item.view];
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`nav-item${isActive ? ' active' : ''}`}
-                  >
-                    {item.icon}
-                    {item.label}
-                    {item.badgeCount !== undefined && item.badgeCount > 0 ? (
-                      <span className="nav-badge">{item.badgeCount}</span>
-                    ) : null}
-                  </Link>
-                );
-              })}
-            </React.Fragment>
-          );
-        })}
+              return (
+                <Link
+                  key={item.view}
+                  href={item.href as any}
+                  onClick={() => props.onNavClick?.()}
+                  className={[
+                    'flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[9px] text-[13px] font-medium transition-[background,color] duration-150',
+                    active
+                      ? 'border-[#4FD1C540] bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]'
+                      : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+                  ].join(' ')}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span className="shrink-0 opacity-90">{item.icon}</span>
+                  <span className="min-w-0 truncate">{item.label}</span>
+                  {badge !== undefined ? (
+                    <span className="ml-auto shrink-0 rounded-full bg-[var(--accent-amber-dim)] px-[6px] py-[1px] font-[family-name:var(--font-mono)] text-[10px] font-semibold text-[var(--accent-amber)]">
+                      {badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      <div className="rail-foot">
-        <div className="rail-admin">
-          <div className="rail-avatar">RA</div>
-          <div>
-            <div className="rail-admin-name">Rony A.</div>
-            <div className="rail-admin-role">Role.Admin</div>
+      <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px]">
+        <div className="flex items-center gap-[9px]">
+          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)]">
+            {adminInitials}
+          </div>
+          <div className="min-w-0">
+            <div className="truncate text-[12.5px] font-semibold">{props.adminName ?? 'Admin'}</div>
+            <div className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.4px] text-[var(--accent-amber)]">
+              {props.adminRole ?? 'Role.Admin'}
+            </div>
           </div>
         </div>
       </div>
