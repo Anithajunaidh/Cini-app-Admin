@@ -161,6 +161,10 @@ type RailProps = {
   adminRole?: string;
   /** Badge counts for nav items (keyed by view name) */
   badges?: Record<string, number>;
+  /** Callback fired when a nav link is clicked */
+  onNavClick?: () => void;
+  /** When true, renders icon-only mode (no labels, narrower width). Used at md breakpoint. */
+  collapsed?: boolean;
 }
 
 /** Fixed sidebar rail with brand, nav groups, and admin user block. */
@@ -178,6 +182,60 @@ export function Rail(props: RailProps) {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+
+  if (props.collapsed) {
+    return (
+      <aside className="sticky top-0 flex h-screen flex-col items-center gap-[6px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[10px] py-[22px]">
+        {/* Brand — icon only */}
+        <div className="mb-4 flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[var(--accent-teal)] to-[#2E7D74] font-[family-name:var(--font-mono)] text-[15px] font-semibold text-[#06231F]">
+          M
+        </div>
+
+        {/* Nav — icon only with title tooltip */}
+        <nav className="flex w-full flex-col items-center gap-[2px]" aria-label="Main navigation">
+          {navGroups.map((group) =>
+            group.items.map((item) => {
+              const active = isActive(item.href);
+              const badge = props.badges?.[item.view];
+              return (
+                <Link
+                  key={item.view}
+                  href={item.href as any}
+                  onClick={() => props.onNavClick?.()}
+                  title={item.label}
+                  className={[
+                    'relative flex items-center justify-center w-[44px] h-[44px] rounded-[10px]',
+                    'border transition-[background,color] duration-150',
+                    active
+                      ? 'bg-[var(--accent-teal-dim)] text-[var(--accent-teal)] border-[#4FD1C540]'
+                      : 'text-[var(--text-muted)] border-transparent hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+                  ].join(' ')}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span className="shrink-0 opacity-90 [&>svg]:w-5 [&>svg]:h-5">{item.icon}</span>
+                  {badge !== undefined && (
+                    <span className="absolute -top-[3px] -right-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            }),
+          )}
+        </nav>
+
+        {/* Admin initials — bottom */}
+        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px]">
+          <div
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)]"
+            title={props.adminName ?? 'Admin'}
+          >
+            {adminInitials}
+          </div>
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside className="sticky top-0 flex h-screen flex-col gap-[26px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[14px] py-[22px]">
@@ -210,6 +268,7 @@ export function Rail(props: RailProps) {
                 <Link
                   key={item.view}
                   href={item.href as any}
+                  onClick={() => props.onNavClick?.()}
                   className={[
                     'flex items-center gap-[10px] px-[10px] py-[9px] rounded-[8px]',
                     'text-[13px] font-medium border transition-[background,color] duration-150',

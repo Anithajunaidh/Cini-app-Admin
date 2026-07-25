@@ -49,18 +49,23 @@ export function SyncPulseStrip() {
   }
 
   return (
-    <div className="flex items-stretch border-b border-[var(--border-soft)] bg-[var(--surface)] px-[22px]">
-      <PulseCell
-        title="last-tmdb-sync"
-        value={tmdbValue}
-        color={tmdbSyncColor(syncStatus?.lastTmdbSync ?? null)}
-      />
-      <PulseCell
-        title="last-avail-sync"
-        value={availValue}
-        color={availSyncColor(syncStatus?.lastAvailSync ?? null)}
-      />
-      <div className="ml-auto flex items-center gap-2 py-3">
+    <div className="flex flex-col border-b border-[var(--border-soft)] bg-[var(--surface)] px-[14px] md:flex-row md:items-stretch md:overflow-x-auto md:px-[22px] md:[&::-webkit-scrollbar]:hidden">
+      {/* Sync cells — stacked on mobile, inline on md+ */}
+      <div className="flex flex-col divide-y divide-[var(--border-soft)] md:flex-row md:divide-y-0">
+        <PulseCell
+          title="last-tmdb-sync"
+          value={tmdbValue}
+          color={tmdbSyncColor(syncStatus?.lastTmdbSync ?? null)}
+        />
+        <PulseCell
+          title="last-avail-sync"
+          value={availValue}
+          color={availSyncColor(syncStatus?.lastAvailSync ?? null)}
+        />
+      </div>
+
+      {/* Trigger sync button — below cells on mobile, inline-end on md+ */}
+      <div className="flex items-center border-t border-[var(--border-soft)] py-2 md:ml-auto md:border-t-0 md:py-3 md:pl-4">
         <button
           type="button"
           onClick={handleTriggerSync}
