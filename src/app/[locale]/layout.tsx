@@ -4,8 +4,8 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
 import { QueryProvider } from '@/lib/providers/query-provider';
-import { routing } from '@/libs/I18nRouting';
 import '@/styles/global.css';
+import { routing } from '@/libs/I18nRouting';
 
 export const metadata: Metadata = {
   icons: [

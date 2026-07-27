@@ -1,8 +1,8 @@
+import type { AxiosError } from 'axios';
+
 export class ApiError extends Error {
   status: number;
-
   code?: string;
-
   fieldErrors?: Record<string, string[]>;
 
   constructor(
