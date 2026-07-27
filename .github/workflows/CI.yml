@@ -36,8 +36,11 @@ jobs:
       - name: Build Next.js
         run: npm run build-local
         env:
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'sk_test_dummySecretKeyForE2ETests' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_SENTRY_DISABLED: 'true' # Only upload Sentry source maps in deployment
           NEXT_PUBLIC_APP_URL: http://localhost:3008
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
       - if: matrix.node-version == '24.x' && success()
         name: Cache Next.js build output
@@ -159,6 +162,8 @@ jobs:
           args: sh -c "HOME=/root npm run test:e2e" # Set HOME to /root to avoid Playwright error with Firebox
         env:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'sk_test_dummySecretKeyForE2ETests' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
       - name: Fix test results permission # Give permissions to test results needed by Chromatic
         run: |
@@ -196,13 +201,13 @@ jobs:
       - name: Crowdin action
         uses: crowdin/github-action@v2
         with:
+          api_token: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          project_id: ${{ secrets.CROWDIN_PROJECT_ID }}
           upload_sources: true
           upload_translations: true
           download_translations: true
           create_pull_request: false
           localization_branch_name: ${{ github.head_ref || github.ref_name }} # explanation here: https://stackoverflow.com/a/71158878
           commit_message: 'chore: new Crowdin translations by GitHub Action'
-          project_id: ${{ secrets.CROWDIN_PROJECT_ID }}
-          token: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

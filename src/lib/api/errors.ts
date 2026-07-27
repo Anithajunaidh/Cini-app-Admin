@@ -35,8 +35,10 @@ export function normalizeApiError(error: AxiosError<ApiErrorResponse>): ApiError
       data?.errors,
     );
   }
+
   if (error.request) {
     return new ApiError('Network error. Check your connection.', 0, 'NETWORK_ERROR');
   }
+
   return new ApiError(error.message ?? 'Unexpected error.', 0, 'UNKNOWN_ERROR');
 }

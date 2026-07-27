@@ -19,6 +19,8 @@ jobs:
       - name: Crowdin action
         uses: crowdin/github-action@v2
         with:
+          api_token: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          project_id: ${{ secrets.CROWDIN_PROJECT_ID }}
           upload_sources: true
           upload_translations: true
           download_translations: true

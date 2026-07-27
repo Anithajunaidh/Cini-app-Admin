@@ -65,13 +65,6 @@
     "alternative_message": "Need advanced features? Multi-tenancy & Teams, Roles & Permissions, Shadcn UI, End-to-End Typesafety with oRPC, Stripe Payment, Light / Dark mode. Try <url></url>.",
     "max_message": "Or, need a Self-hosted auth stack (Better Auth)? Try <url></url>."
   },
-  "DashboardLayout": {
-    "meta_title": "Dashboard",
-    "meta_description": "Manage your account from the dashboard.",
-    "dashboard_link": "Dashboard",
-    "user_profile_link": "Manage your account",
-    "sign_out": "Sign out"
-  },
   "LocaleSwitcher": {
     "change_language": "Change language"
   }

@@ -6,10 +6,12 @@ type DashboardLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-export const metadata: Metadata = {
-  title: 'Dashboard — MIRALO Admin',
-  description: 'Admin backoffice overview.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Dashboard',
+    description: 'Manage your account from the dashboard.',
+  };
+}
 
 export default async function DashboardLayout(props: DashboardLayoutProps) {
   const { locale } = await props.params;
