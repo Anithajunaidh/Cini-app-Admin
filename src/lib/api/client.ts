@@ -17,13 +17,13 @@ async function refreshAccessToken() {
 function handleLogout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('access_token');
-    window.location.href = '/login';
+    window.location.href = '/sign-in';
   }
 }
 
 // eslint-disable-next-line import/no-named-as-default-member
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000',
   timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export const apiClient = axios.create({
 // ---- REQUEST INTERCEPTOR ----
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = getAccessToken(); // implement per your auth strategy
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
