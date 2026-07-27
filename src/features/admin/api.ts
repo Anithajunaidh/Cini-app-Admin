@@ -44,7 +44,7 @@ export function useAdminSyncStatus() {
 export function useTriggerSync() {
   return useMutation({
     mutationFn: async (target: 'tmdb' | 'availability') => {
-      const { data } = await apiClient.post<SyncTriggerResponseDto>(ENDPOINTS.admin.sync.trigger, {
+      const data = await apiClient.post<SyncTriggerResponseDto>(ENDPOINTS.admin.sync.trigger, {
         target,
       });
       return data;
@@ -107,7 +107,7 @@ export function useCreatePlatform() {
 
   return useMutation({
     mutationFn: async (payload: CreatePlatformDto) => {
-      const { data } = await apiClient.post<AdminPlatformDto>(
+      const data = await apiClient.post<AdminPlatformDto>(
         ENDPOINTS.admin.platforms.list,
         payload,
       );

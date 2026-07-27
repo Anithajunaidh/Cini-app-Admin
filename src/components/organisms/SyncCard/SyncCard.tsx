@@ -1,7 +1,7 @@
 'use client';
 
-import { PulseDot } from '@/components/atoms/PulseDot';
 import { GhostButton } from '@/components/atoms/GhostButton';
+import { PulseDot } from '@/components/atoms/PulseDot';
 
 type SyncCardProps = {
   /** Display label, e.g. "TMDB catalogue sync" */
@@ -44,7 +44,7 @@ export function SyncCard(props: SyncCardProps) {
       </div>
 
       {/* Large timestamp */}
-      <div className="mt-[14px] break-all font-[family-name:var(--font-mono)] text-[20px] font-semibold leading-tight sm:text-[22px]">
+      <div className="mt-[14px] font-[family-name:var(--font-mono)] text-[20px] leading-tight font-semibold break-all sm:text-[22px]">
         {props.timestamp}
       </div>
       <div className="mt-[2px] text-[11.5px] text-[var(--text-muted)]">{props.workerLabel}</div>

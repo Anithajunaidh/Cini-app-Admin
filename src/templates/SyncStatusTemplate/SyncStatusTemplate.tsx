@@ -1,31 +1,31 @@
 'use client';
 
 import { useState } from 'react';
-import { SyncCard } from '@/components/organisms/SyncCard';
-import { Panel } from '@/components/organisms/Panel';
-import { EmptyState } from '@/components/molecules/EmptyState';
 import { Badge } from '@/components/atoms/Badge';
+import { EmptyState } from '@/components/molecules/EmptyState';
+import { Panel } from '@/components/organisms/Panel';
+import { SyncCard } from '@/components/organisms/SyncCard';
 import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
 
 // Helpers — mirrored from SyncPulseStrip so both stay in sync
 
 function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
-  if (!isoString) return 'amber';
+  if (!isoString) {return 'amber';}
   const ageMs = Date.now() - new Date(isoString).getTime();
   return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
-  if (epochSeconds == null) return 'amber';
+  if (epochSeconds == null) {return 'amber';}
   const ageMs = Date.now() - epochSeconds * 1000;
   return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function formatRelative(ms: number): string {
   const min = Math.floor(ms / 60_000);
-  if (min < 60) return `${min}m ago`;
+  if (min < 60) {return `${min}m ago`;}
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
+  if (hr < 24) {return `${hr}h ago`;}
   return `${Math.floor(hr / 24)}d ago`;
 }
 
@@ -155,7 +155,7 @@ export function SyncStatusTemplate() {
                 {['Target', 'Triggered at', 'Status'].map((h) => (
                   <th
                     key={h}
-                    className="border-b border-[var(--border-soft)] px-[18px] py-[10px] text-left font-[family-name:var(--font-mono)] text-[10.5px] font-medium uppercase tracking-[0.5px] text-[var(--text-faint)]"
+                    className="border-b border-[var(--border-soft)] px-[18px] py-[10px] text-left font-[family-name:var(--font-mono)] text-[10.5px] font-medium tracking-[0.5px] text-[var(--text-faint)] uppercase"
                   >
                     {h}
                   </th>
