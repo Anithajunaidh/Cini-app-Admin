@@ -19,14 +19,20 @@ export class ApiError extends Error {
   }
 }
 
-export function normalizeApiError(error: AxiosError<Record<string, unknown>>): ApiError {
+export type ApiErrorResponse = {
+  message?: string;
+  code?: string;
+  errors?: Record<string, string[]>;
+};
+
+export function normalizeApiError(error: AxiosError<ApiErrorResponse>): ApiError {
   if (error.response) {
     const { status, data } = error.response;
     return new ApiError(
-      (data?.message as string) ?? 'Something went wrong.',
+      data?.message ?? 'Something went wrong. Please try again.',
       status,
-      data?.code as string | undefined,
-      data?.errors as Record<string, string[]> | undefined,
+      data?.code,
+      data?.errors,
     );
   }
   if (error.request) {

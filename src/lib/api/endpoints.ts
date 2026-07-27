@@ -1,5 +1,13 @@
-/** All API endpoint paths. Group by resource/domain. Dynamic segments are functions. */
+/** All API endpoint paths. Group by resource/domain. */
 export const ENDPOINTS = {
+  auth: {
+    login: '/auth/login',
+    refresh: '/auth/refresh',
+    logout: '/auth/logout',
+  },
+  testUsers: {
+    list: '/users',
+  },
   admin: {
     stats: '/api/v1/admin/stats',
     sync: {

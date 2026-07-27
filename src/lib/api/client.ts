@@ -17,14 +17,12 @@ async function refreshAccessToken() {
 function handleLogout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('access_token');
-    // We keep feat/admin-ui's path here
     window.location.href = '/sign-in';
   }
 }
 
 // eslint-disable-next-line import/no-named-as-default-member
 export const apiClient = axios.create({
-  // We keep feat/admin-ui's local fallback
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000',
   timeout: 15_000,
   headers: {
@@ -49,11 +47,8 @@ apiClient.interceptors.request.use(
 
 // ---- RESPONSE INTERCEPTOR ----
 apiClient.interceptors.response.use(
-  // We keep main's response.data unwrapping
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   (response) => response.data,
-  
-  // We keep main's superior retry logic
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config;
@@ -66,10 +61,10 @@ apiClient.interceptors.response.use(
     ) {
       Reflect.set(originalRequest, '_retry', true);
       try {
-        await refreshAccessToken();
+        await refreshAccessToken(); // implement per your auth strategy
         return await apiClient(originalRequest);
       } catch {
-        handleLogout();
+        handleLogout(); // clear session, redirect to /login
         throw normalizeApiError(error);
       }
     }

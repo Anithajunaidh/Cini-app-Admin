@@ -1,18 +1,16 @@
 import { QueryClient } from '@tanstack/react-query';
-import type { ApiError } from '@/lib/api/errors';
+import { ApiError } from '@/lib/api/errors';
 
 export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000, // 1 minute
-        gcTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 60 * 1000, // 1 min — tune per app
+        gcTime: 5 * 60 * 1000,
         retry: (failureCount, error) => {
-          const apiError = error as ApiError;
-          // Don't retry client errors (4xx)
-          if (apiError?.status >= 400 && apiError?.status < 500) {
+          if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
             return false;
-          }
+          } // don't retry client errors
           return failureCount < 2;
         },
         refetchOnWindowFocus: false,
