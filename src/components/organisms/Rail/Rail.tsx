@@ -26,7 +26,14 @@ const navGroups: NavGroup[] = [
         href: '/dashboard',
         view: 'dashboard',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <rect x="3" y="3" width="7" height="9" rx="1.5" />
             <rect x="14" y="3" width="7" height="5" rx="1.5" />
             <rect x="14" y="12" width="7" height="9" rx="1.5" />
@@ -44,7 +51,14 @@ const navGroups: NavGroup[] = [
         href: '/dashboard/comments',
         view: 'comments',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <path d="M21 12a8 8 0 1 1-3.5-6.6" />
             <path d="M21 5v5h-5" />
           </svg>
@@ -55,7 +69,14 @@ const navGroups: NavGroup[] = [
         href: '/dashboard/reports',
         view: 'reports',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <path d="M12 9v4" />
             <path d="M12 17h.01" />
             <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
@@ -69,10 +90,17 @@ const navGroups: NavGroup[] = [
     items: [
       {
         label: 'Platforms',
-        href: '/dashboard/platforms',
+        href: '/platforms',
         view: 'platforms',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <rect x="3" y="4" width="18" height="14" rx="2" />
             <path d="M8 21h8M12 18v3" />
           </svg>
@@ -80,10 +108,17 @@ const navGroups: NavGroup[] = [
       },
       {
         label: 'Sync status',
-        href: '/dashboard/sync',
+        href: '/sync',
         view: 'sync',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <path d="M21 2v6h-6" />
             <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
             <path d="M3 22v-6h6" />
@@ -101,7 +136,14 @@ const navGroups: NavGroup[] = [
         href: '/dashboard/users',
         view: 'users',
         icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M22 21v-2a4 4 0 0 0-3-3.87" />

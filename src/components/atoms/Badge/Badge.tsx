@@ -1,23 +1,41 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 
-type BadgeVariant =
+export type BadgeVariant =
   | 'reported'
-  | 'pending'
   | 'hidden'
-  | 'suspended'
   | 'resolved'
+  | 'pending'
   | 'active-role'
-  | 'admin-role';
+  | 'admin-role'
+  | 'suspended';
 
-interface BadgeProps {
+type BadgeProps = {
   variant: BadgeVariant;
-  children: React.ReactNode;
-}
+  children: ReactNode;
+};
 
-export function Badge({ variant, children }: BadgeProps) {
+const variantStyles: Record<BadgeVariant, string> = {
+  reported: 'bg-[var(--accent-amber-dim)] text-[var(--accent-amber)]',
+  hidden: 'bg-[var(--accent-red-dim)] text-[var(--accent-red)]',
+  resolved: 'bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]',
+  pending: 'bg-[var(--accent-amber-dim)] text-[var(--accent-amber)]',
+  'active-role': 'bg-[#8CA0B322] text-[var(--text-muted)]',
+  'admin-role': 'bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]',
+  suspended: 'bg-[var(--accent-red-dim)] text-[var(--accent-red)]',
+};
+
+/** Renders a status/category badge with one of 7 color variants. */
+export function Badge(props: BadgeProps) {
   return (
-    <span className={`badge ${variant}`}>
-      {children}
+    <span
+      className={[
+        'inline-flex items-center gap-[5px]',
+        'font-[family-name:var(--font-mono)] text-[10.5px] tracking-[0.3px]',
+        'px-[9px] py-[3px] rounded-full',
+        variantStyles[props.variant],
+      ].join(' ')}
+    >
+      {props.children}
     </span>
   );
 }
