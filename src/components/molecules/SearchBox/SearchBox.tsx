@@ -1,6 +1,11 @@
 'use client';
 
-export function SearchBox() {
+type SearchBoxProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export function SearchBox(props: SearchBoxProps) {
   return (
     <div className="flex w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 md:w-[280px]">
       <span className="shrink-0" aria-hidden="true">
@@ -11,6 +16,10 @@ export function SearchBox() {
       </span>
       <input
         type="search"
+        value={props.value}
+        onChange={function(event) {
+          props.onChange(event.target.value);
+        }}
         placeholder="Search users, titles, ids…"
         className="w-full border-none bg-transparent text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none"
         aria-label="Search users, titles, ids"

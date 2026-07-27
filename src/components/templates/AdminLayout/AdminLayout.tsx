@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Rail } from '@/components/organisms/Rail';
 import { SyncPulseStrip } from '@/components/organisms/SyncPulseStrip';
 import { Topbar } from '@/components/organisms/Topbar';
 import { getAvailabilityReportCounts, getCommentQueueCounts } from '@/data/admin-moderation';
+import { AdminSearchFallbackProvider, AdminSearchProvider } from '@/hooks/useAdminSearch';
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -15,7 +16,7 @@ type AdminLayoutProps = {
   adminRole?: string;
 };
 
-export function AdminLayout(props: AdminLayoutProps) {
+function AdminLayoutShell(props: AdminLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -110,5 +111,21 @@ export function AdminLayout(props: AdminLayoutProps) {
         </div>
       </main>
     </div>
+  );
+}
+
+export function AdminLayout(props: AdminLayoutProps) {
+  return (
+    <Suspense
+      fallback={(
+        <AdminSearchFallbackProvider>
+          <AdminLayoutShell {...props} />
+        </AdminSearchFallbackProvider>
+      )}
+    >
+      <AdminSearchProvider>
+        <AdminLayoutShell {...props} />
+      </AdminSearchProvider>
+    </Suspense>
   );
 }

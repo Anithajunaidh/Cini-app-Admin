@@ -1,4 +1,7 @@
+'use client';
+
 import { SearchBox } from '@/components/molecules/SearchBox';
+import { useAdminSearch } from '@/hooks/useAdminSearch';
 
 type TopbarProps = {
   eyebrow: string;
@@ -6,6 +9,8 @@ type TopbarProps = {
 };
 
 export function Topbar(props: TopbarProps) {
+  const search = useAdminSearch();
+
   return (
     <div className="flex flex-col gap-4 px-[14px] pb-[6px] pt-[14px] md:flex-row md:items-center md:justify-between md:px-[22px] md:pt-[18px]">
       <div>
@@ -16,7 +21,10 @@ export function Topbar(props: TopbarProps) {
           {props.title}
         </div>
       </div>
-      <SearchBox />
+      <SearchBox
+        value={search.query}
+        onChange={search.setQuery}
+      />
     </div>
   );
 }

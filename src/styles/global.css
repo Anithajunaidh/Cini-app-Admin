@@ -574,6 +574,16 @@ tbody tr:hover {
   color: var(--accent-red);
 }
 
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-ghost:disabled:hover {
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
 .panel-foot {
   display: flex;
   align-items: center;

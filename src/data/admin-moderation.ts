@@ -1,5 +1,6 @@
 import commentQueueData from '@/data/admin-comment-queue.json';
 import availabilityReportsData from '@/data/admin-availability-reports.json';
+import { matchSearchQuery } from '@/lib/search/matchSearchQuery';
 
 export interface AdminComment {
   id: string;
@@ -53,38 +54,72 @@ export function getAvailabilityReportCounts() {
   };
 }
 
-export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilter) {
+/**
+ * Filters comment queue rows by status and search query.
+ * @param rows - Full comment list.
+ * @param filter - Active filter tab.
+ * @param query - Search string matched against comment fields.
+ * @returns Filtered comments in descending recency order.
+ */
+export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilter, query = '') {
   return rows
     .slice()
     .filter(function(comment) {
       if (filter === 'reported') {
-        return !comment.hidden;
+        if (comment.hidden) {
+          return false;
+        }
+      } else if (filter === 'hidden') {
+        if (!comment.hidden) {
+          return false;
+        }
       }
 
-      if (filter === 'hidden') {
-        return comment.hidden;
-      }
-
-      return true;
+      return matchSearchQuery(query, [
+        comment.text,
+        comment.id,
+        comment.userId,
+        comment.titleName,
+        comment.titleId,
+      ]);
     })
     .sort(function(left, right) {
       return new Date(right.reportedAt ?? right.createdAt).getTime() - new Date(left.reportedAt ?? left.createdAt).getTime();
     });
 }
 
-export function filterAvailabilityReportsRows(rows: AdminAvailabilityReport[], filter: AvailabilityFilter) {
+/**
+ * Filters availability report rows by status and search query.
+ * @param rows - Full report list.
+ * @param filter - Active filter tab.
+ * @param query - Search string matched against report fields.
+ * @returns Filtered reports in descending recency order.
+ */
+export function filterAvailabilityReportsRows(
+  rows: AdminAvailabilityReport[],
+  filter: AvailabilityFilter,
+  query = '',
+) {
   return rows
     .slice()
     .filter(function(report) {
       if (filter === 'unresolved') {
-        return !report.resolved;
+        if (report.resolved) {
+          return false;
+        }
+      } else if (filter === 'resolved') {
+        if (!report.resolved) {
+          return false;
+        }
       }
 
-      if (filter === 'resolved') {
-        return report.resolved;
-      }
-
-      return true;
+      return matchSearchQuery(query, [
+        report.title,
+        report.platform,
+        report.category,
+        report.reportedBy,
+        report.resolution,
+      ]);
     })
     .sort(function(left, right) {
       return new Date(right.reportedAt).getTime() - new Date(left.reportedAt).getTime();
