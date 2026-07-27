@@ -3,8 +3,9 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
-import { routing } from '@/libs/I18nRouting';
+import { QueryProvider } from '@/lib/providers/query-provider';
 import '@/styles/global.css';
+import { routing } from '@/libs/I18nRouting';
 
 export const metadata: Metadata = {
   icons: [
@@ -55,11 +56,13 @@ export default async function RootLayout(props: {
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
-          {props.children}
+        <QueryProvider>
+          <NextIntlClientProvider>
+            {props.children}
 
-          <DemoBadge />
-        </NextIntlClientProvider>
+            <DemoBadge />
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );
