@@ -1,0 +1,58 @@
+{
+  "stats": {
+    "totalUsers": 1423,
+    "activeUsers": 840,
+    "totalTitles": 28540,
+    "totalRatings": 104230,
+    "pendingReports": 4
+  },
+  "syncStatus": {
+    "lastTmdbSync": "2026-07-24T12:00:00Z",
+    "lastAvailSync": 1721820000
+  },
+  "comments": [
+    {
+      "id": "c1",
+      "text": "This movie is terrible and the description is wrong!",
+      "title": "Inception",
+      "authorId": "u1",
+      "hidden": false,
+      "createdAt": "2026-07-24T10:00:00Z"
+    }
+  ],
+  "reports": [
+    {
+      "id": "r1",
+      "titleName": "The Matrix",
+      "platform": "Netflix",
+      "category": "missing_episode",
+      "reportedBy": "u2",
+      "resolvedAt": null,
+      "resolution": null,
+      "createdAt": "2026-07-24T09:00:00Z"
+    }
+  ],
+  "platforms": [
+    {
+      "id": "p1",
+      "name": "Netflix",
+      "slug": "netflix",
+      "subscriberCount": 850,
+      "titleCount": 4500
+    },
+    {
+      "id": "p2",
+      "name": "Amazon Prime",
+      "slug": "amazon-prime",
+      "subscriberCount": 620,
+      "titleCount": 8200
+    },
+    {
+      "id": "p3",
+      "name": "Hulu",
+      "slug": "hulu",
+      "subscriberCount": 410,
+      "titleCount": 2100
+    }
+  ]
+}
