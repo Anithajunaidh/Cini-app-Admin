@@ -1,0 +1,194 @@
+[
+  {
+    "id": "u_2291",
+    "name": "Aditi Menon",
+    "email": "aditi@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-11-02"
+  },
+  {
+    "id": "u_5580",
+    "name": "Fahad Rahman",
+    "email": "fahad@example.com",
+    "role": "MODERATOR",
+    "suspended": false,
+    "joinedAt": "2023-06-19"
+  },
+  {
+    "id": "u_8841",
+    "name": "Priya Nair",
+    "email": "priya@example.com",
+    "role": "USER",
+    "suspended": true,
+    "joinedAt": "2025-01-08"
+  },
+  {
+    "id": "u_0001",
+    "name": "Rony A.",
+    "email": "rony@innogenio.example",
+    "role": "ADMIN",
+    "suspended": false,
+    "joinedAt": "2022-09-30"
+  },
+  {
+    "id": "u_3201",
+    "name": "Kavya Iyer",
+    "email": "kavya@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-03-14"
+  },
+  {
+    "id": "u_4412",
+    "name": "Omar Siddiqui",
+    "email": "omar@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-07-22"
+  },
+  {
+    "id": "u_5523",
+    "name": "Meera Desai",
+    "email": "meera@example.com",
+    "role": "MODERATOR",
+    "suspended": false,
+    "joinedAt": "2023-11-05"
+  },
+  {
+    "id": "u_6634",
+    "name": "Arjun Kapoor",
+    "email": "arjun@example.com",
+    "role": "USER",
+    "suspended": true,
+    "joinedAt": "2025-02-18"
+  },
+  {
+    "id": "u_7743",
+    "name": "Sana Qureshi",
+    "email": "sana@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-09-01"
+  },
+  {
+    "id": "u_8855",
+    "name": "Dev Patel",
+    "email": "dev@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2023-04-27"
+  },
+  {
+    "id": "u_9966",
+    "name": "Ananya Bose",
+    "email": "ananya@example.com",
+    "role": "ADMIN",
+    "suspended": false,
+    "joinedAt": "2022-12-11"
+  },
+  {
+    "id": "u_1077",
+    "name": "Rohan Mehta",
+    "email": "rohan@example.com",
+    "role": "USER",
+    "suspended": true,
+    "joinedAt": "2024-01-30"
+  },
+  {
+    "id": "u_1188",
+    "name": "Leila Hassan",
+    "email": "leila@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2025-03-04"
+  },
+  {
+    "id": "u_1299",
+    "name": "Nikhil Rao",
+    "email": "nikhil@example.com",
+    "role": "MODERATOR",
+    "suspended": false,
+    "joinedAt": "2023-08-16"
+  },
+  {
+    "id": "u_1310",
+    "name": "Tara Singh",
+    "email": "tara@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-05-09"
+  },
+  {
+    "id": "u_1421",
+    "name": "Vikram Sethi",
+    "email": "vikram@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2023-02-21"
+  },
+  {
+    "id": "u_1532",
+    "name": "Zara Khan",
+    "email": "zara@example.com",
+    "role": "USER",
+    "suspended": true,
+    "joinedAt": "2024-12-03"
+  },
+  {
+    "id": "u_1643",
+    "name": "Ishaan Gupta",
+    "email": "ishaan@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2025-04-15"
+  },
+  {
+    "id": "u_1754",
+    "name": "Neha Verma",
+    "email": "neha@example.com",
+    "role": "MODERATOR",
+    "suspended": false,
+    "joinedAt": "2023-10-28"
+  },
+  {
+    "id": "u_1865",
+    "name": "Kabir Malhotra",
+    "email": "kabir@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-08-07"
+  },
+  {
+    "id": "u_1976",
+    "name": "Aisha Begum",
+    "email": "aisha@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2025-05-20"
+  },
+  {
+    "id": "u_2087",
+    "name": "Siddharth Jain",
+    "email": "siddharth@example.com",
+    "role": "USER",
+    "suspended": true,
+    "joinedAt": "2023-07-12"
+  },
+  {
+    "id": "u_2198",
+    "name": "Pooja Reddy",
+    "email": "pooja@example.com",
+    "role": "USER",
+    "suspended": false,
+    "joinedAt": "2024-10-25"
+  },
+  {
+    "id": "u_2210",
+    "name": "Imran Ali",
+    "email": "imran@example.com",
+    "role": "ADMIN",
+    "suspended": false,
+    "joinedAt": "2022-05-18"
+  }
+]

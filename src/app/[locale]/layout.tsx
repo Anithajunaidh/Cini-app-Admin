@@ -4,8 +4,8 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
 import { QueryProvider } from '@/lib/providers/query-provider';
-import '@/styles/global.css';
 import { routing } from '@/libs/I18nRouting';
+import '@/styles/global.css';
 
 export const metadata: Metadata = {
   icons: [
@@ -54,7 +54,7 @@ export default async function RootLayout(props: {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html suppressHydrationWarning lang={locale}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -64,13 +64,13 @@ export default async function RootLayout(props: {
         />
       </head>
       <body>
-        <QueryProvider>
-          <NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <QueryProvider>
             {props.children}
 
             <DemoBadge />
-          </NextIntlClientProvider>
-        </QueryProvider>
+          </QueryProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

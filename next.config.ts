@@ -12,6 +12,9 @@ const baseConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   reactCompiler: process.env.NODE_ENV === 'production', // Keep the development environment fast
+  turbopack: {
+    root: process.cwd(),
+  },
   logging: {
     browserToTerminal: process.env.BROWSER_TO_TERMINAL_DISABLED !== 'true',
   },

@@ -1,6 +1,6 @@
 import { detectBot } from '@arcjet/next';
 import createMiddleware from 'next-intl/middleware';
-import type { NextFetchEvent, NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import arcjet from '@/libs/Arcjet';
 import { routing } from './libs/I18nRouting';
@@ -21,7 +21,7 @@ const aj = arcjet.withRule(
   }),
 );
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default async function proxy(request: NextRequest) {
   // Verify the request with Arcjet
   // Use `process.env` instead of Env to reduce bundle size in middleware
   if (process.env.ARCJET_KEY) {
@@ -30,6 +30,11 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+  }
+
+  // Let local development bypass auth checks so the dashboard can be verified directly.
+  if (process.env.NODE_ENV === 'development') {
+    return handleI18nRouting(request);
   }
 
   return handleI18nRouting(request);

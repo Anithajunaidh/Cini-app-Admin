@@ -10,7 +10,7 @@
   </a>
 </p>
 
-🚀 Boilerplate and Starter for Next.js with App Router, Tailwind CSS, and TypeScript ⚡️ Prioritizing developer experience first: Next.js, TypeScript, ESLint, Prettier, Lefthook (replacing Husky), Lint-Staged, Vitest (replacing Jest), Testing Library, Playwright, Commitlint, VSCode, Tailwind CSS, Authentication with [Clerk](https://clerk.com?utm_source=github&utm_medium=sponsorship&utm_campaign=nextjs-boilerplate), Database with DrizzleORM (PostgreSQL, SQLite, and MySQL), Local database with PGlite and production with [Neon](https://get.neon.com/BMFYNtx), Error Monitoring with [Sentry](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy25q1-nextjs&utm_content=github-banner-nextjsboilerplate-logo), Logging with LogTape (replacing Pino.js) and Log Management, Monitoring as Code, Storybook, Multi-language (i18n), AI-powered code reviews with CodeRabbit, Secure with [Arcjet](https://launch.arcjet.com/Q6eLbRE) (Bot detection, Rate limiting, Attack protection, etc.), and more.
+🚀 Boilerplate and Starter for Next.js with App Router, Tailwind CSS, and TypeScript ⚡️ Prioritizing developer experience first: Next.js, TypeScript, ESLint, Prettier, Lefthook (replacing Husky), Lint-Staged, Vitest (replacing Jest), Testing Library, Playwright, Commitlint, VSCode, Tailwind CSS, Database with DrizzleORM (PostgreSQL, SQLite, and MySQL), Local database with PGlite and production with [Neon](https://get.neon.com/BMFYNtx), Error Monitoring with [Sentry](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy25q1-nextjs&utm_content=github-banner-nextjsboilerplate-logo), Logging with LogTape (replacing Pino.js) and Log Management, Monitoring as Code, Storybook, Multi-language (i18n), AI-powered code reviews with CodeRabbit, Secure with [Arcjet](https://launch.arcjet.com/Q6eLbRE) (Bot detection, Rate limiting, Attack protection, etc.), and more.
 
 Clone this project and use it to create your own Next.js project. You can check out the live demo at [Next.js Boilerplate](https://demo.nextjs-boilerplate.com), which includes a working authentication system.
 
@@ -19,12 +19,8 @@ Clone this project and use it to create your own Next.js project. You can check 
 <table width="100%">
   <tr height="187px">
     <td align="center" width="33%">
-      <a href="https://clerk.com?utm_source=github&utm_medium=sponsorship&utm_campaign=nextjs-boilerplate">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/6fb61971-3bf1-4580-98a0-10bd3f1040a2">
-          <source media="(prefers-color-scheme: light)" srcset="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/f80a8bb5-66da-4772-ad36-5fabc5b02c60">
-          <img alt="Clerk – Authentication & User Management for Next.js" src="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/f80a8bb5-66da-4772-ad36-5fabc5b02c60">
-        </picture>
+      <a href="mailto:contact@nextjs-boilerplate.com">
+        Add your logo here
       </a>
     </td>
     <td align="center" width="33%">
@@ -126,8 +122,8 @@ Developer experience first, extremely flexible code structure and only keep what
 - 💎 Integrate with [Tailwind CSS](https://tailwindcss.com)
 - 🤖 AI coding agent instructions for Claude Code, Codex, Cursor, OpenCode, Copilot, and more
 - ✅ Strict Mode for TypeScript and React 19
-- 🔒 Authentication with [Clerk](https://clerk.com?utm_source=github&utm_medium=sponsorship&utm_campaign=nextjs-boilerplate): Sign up, Sign in, Sign out, Forgot password, Reset password, and more.
-- 👤 Passwordless Authentication with Magic Links, Multi-Factor Auth (MFA), Social Auth (Google, Facebook, Twitter, GitHub, Apple, and more), Passwordless login with Passkeys, User Impersonation
+- 🔒 Authentication support for sign up, sign in, sign out, forgot password, reset password, and more.
+- 👤 Passwordless authentication with magic links, multi-factor auth (MFA), social auth (Google, Facebook, Twitter, GitHub, Apple, and more), passwordless login with passkeys, user impersonation
 - 📦 Type-safe ORM with DrizzleORM, compatible with PostgreSQL, SQLite, and MySQL
 - 💽 Offline and local development database with PGlite
 - ☁️ Remote and production database with [Neon](https://get.neon.com/BMFYNtx)
@@ -220,14 +216,9 @@ Or, need a Self-hosted auth stack (Better Auth)? Try [Next.js Boilerplate Max](h
 
 ### Set up authentication
 
-To get started, create a Clerk account at [Clerk.com](https://clerk.com?utm_source=github&utm_medium=sponsorship&utm_campaign=nextjs-boilerplate) and create a new application in the Clerk Dashboard. Then copy the `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` values and add them to your `.env.local` file (not tracked by Git):
+Configure your preferred authentication provider and add the required environment variables to your local `.env` file (not tracked by Git).
 
-```shell
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_pub_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-```
-
-You now have a fully functional authentication system with Next.js, including features such as sign up, sign in, sign out, forgot password, reset password, update profile, update password, update email, delete account, and more.
+You now have a fully functional authentication system with Next.js, including sign up, sign in, sign out, forgot password, reset password, update profile, update password, update email, delete account, and more.
 
 ### Set up remote database
 
@@ -427,8 +418,6 @@ It generates an optimized production build of the boilerplate. To test the gener
 $ npm run start
 ```
 
-You also need to defined the environment variables `CLERK_SECRET_KEY` using your own key.
-
 This command starts a local server using the production build. You can now open http://localhost:3000 in your preferred browser to see the result.
 
 ### Error Monitoring
@@ -545,12 +534,8 @@ See [LICENSE](LICENSE) for more information.
 <table width="100%">
   <tr height="187px">
     <td align="center" width="33%">
-      <a href="https://clerk.com?utm_source=github&utm_medium=sponsorship&utm_campaign=nextjs-boilerplate">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/6fb61971-3bf1-4580-98a0-10bd3f1040a2">
-          <source media="(prefers-color-scheme: light)" srcset="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/f80a8bb5-66da-4772-ad36-5fabc5b02c60">
-          <img alt="Clerk – Authentication & User Management for Next.js" src="https://github.com/ixartz/SaaS-Boilerplate/assets/1328388/f80a8bb5-66da-4772-ad36-5fabc5b02c60">
-        </picture>
+      <a href="mailto:contact@nextjs-boilerplate.com">
+        Add your logo here
       </a>
     </td>
     <td align="center" width="33%">

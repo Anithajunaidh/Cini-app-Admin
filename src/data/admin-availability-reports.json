@@ -1,0 +1,233 @@
+[
+  {
+    "id": "r_1001",
+    "title": "Dune: Part Two",
+    "platform": "Prime Video",
+    "category": "CONTENT",
+    "reportedBy": "u_3390",
+    "reportedAt": "2026-07-24T05:22:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1002",
+    "title": "The Bear - S3",
+    "platform": "Disney+ Hotstar",
+    "category": "REGION",
+    "reportedBy": "u_9021",
+    "reportedAt": "2026-07-24T00:14:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1003",
+    "title": "Past Lives",
+    "platform": null,
+    "category": "CONTENT",
+    "reportedBy": "u_4471",
+    "reportedAt": "2026-07-23T18:05:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1004",
+    "title": "Oppenheimer",
+    "platform": "JioCinema",
+    "category": "CONTENT",
+    "reportedBy": "u_2010",
+    "reportedAt": "2026-07-23T13:30:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1005",
+    "title": "Severance",
+    "platform": "Apple TV+",
+    "category": "REGION",
+    "reportedBy": "u_2205",
+    "reportedAt": "2026-07-23T11:22:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1006",
+    "title": "The Last of Us",
+    "platform": "JioCinema",
+    "category": "CONTENT",
+    "reportedBy": "u_8811",
+    "reportedAt": "2026-07-23T08:55:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1007",
+    "title": "Blue Eye Samurai",
+    "platform": "Netflix",
+    "category": "AVAILABILITY",
+    "reportedBy": "u_4452",
+    "reportedAt": "2026-07-23T07:12:00Z",
+    "resolved": false,
+    "resolution": null,
+    "resolvedAt": null
+  },
+  {
+    "id": "r_1008",
+    "title": "The Creator",
+    "platform": "Prime Video",
+    "category": "CONTENT",
+    "reportedBy": "u_4001",
+    "reportedAt": "2026-07-22T20:10:00Z",
+    "resolved": true,
+    "resolution": "Confirmed live after platform sync.",
+    "resolvedAt": "2026-07-22T21:05:00Z"
+  },
+  {
+    "id": "r_1009",
+    "title": "House of the Dragon",
+    "platform": "JioCinema",
+    "category": "REGION",
+    "reportedBy": "u_9102",
+    "reportedAt": "2026-07-22T18:40:00Z",
+    "resolved": true,
+    "resolution": "Region lock corrected after review.",
+    "resolvedAt": "2026-07-22T19:20:00Z"
+  },
+  {
+    "id": "r_1010",
+    "title": "The Boys",
+    "platform": "Prime Video",
+    "category": "BUG",
+    "reportedBy": "u_7720",
+    "reportedAt": "2026-07-22T17:12:00Z",
+    "resolved": true,
+    "resolution": "Availability endpoint refreshed and verified.",
+    "resolvedAt": "2026-07-22T17:55:00Z"
+  },
+  {
+    "id": "r_1011",
+    "title": "Civil War",
+    "platform": null,
+    "category": "CONTENT",
+    "reportedBy": "u_2231",
+    "reportedAt": "2026-07-22T15:05:00Z",
+    "resolved": true,
+    "resolution": "Title mapped to the active release window.",
+    "resolvedAt": "2026-07-22T16:10:00Z"
+  },
+  {
+    "id": "r_1012",
+    "title": "Fallout",
+    "platform": "Prime Video",
+    "category": "AVAILABILITY",
+    "reportedBy": "u_7811",
+    "reportedAt": "2026-07-22T12:30:00Z",
+    "resolved": true,
+    "resolution": "Mismatch cleared after catalogue sync.",
+    "resolvedAt": "2026-07-22T13:15:00Z"
+  },
+  {
+    "id": "r_1013",
+    "title": "Shogun",
+    "platform": "Disney+ Hotstar",
+    "category": "OTHER",
+    "reportedBy": "u_6402",
+    "reportedAt": "2026-07-22T10:15:00Z",
+    "resolved": true,
+    "resolution": "Resolved manually with release note attached.",
+    "resolvedAt": "2026-07-22T11:20:00Z"
+  },
+  {
+    "id": "r_1014",
+    "title": "Poor Things",
+    "platform": "Netflix",
+    "category": "CONTENT",
+    "reportedBy": "u_5520",
+    "reportedAt": "2026-07-22T08:50:00Z",
+    "resolved": true,
+    "resolution": "Confirmed available in current region.",
+    "resolvedAt": "2026-07-22T09:30:00Z"
+  },
+  {
+    "id": "r_1015",
+    "title": "Killers of the Flower Moon",
+    "platform": "Apple TV+",
+    "category": "REGION",
+    "reportedBy": "u_3309",
+    "reportedAt": "2026-07-22T06:45:00Z",
+    "resolved": true,
+    "resolution": "Geo restriction updated.",
+    "resolvedAt": "2026-07-22T07:40:00Z"
+  },
+  {
+    "id": "r_1016",
+    "title": "The Creator",
+    "platform": "Prime Video",
+    "category": "CONTENT",
+    "reportedBy": "u_4019",
+    "reportedAt": "2026-07-22T05:12:00Z",
+    "resolved": true,
+    "resolution": "Duplicate report closed.",
+    "resolvedAt": "2026-07-22T06:05:00Z"
+  },
+  {
+    "id": "r_1017",
+    "title": "The Bear - S3",
+    "platform": "Disney+ Hotstar",
+    "category": "DUBIOUS",
+    "reportedBy": "u_2202",
+    "reportedAt": "2026-07-22T03:30:00Z",
+    "resolved": true,
+    "resolution": "Backend team confirmed the entry is valid.",
+    "resolvedAt": "2026-07-22T04:05:00Z"
+  },
+  {
+    "id": "r_1018",
+    "title": "Past Lives",
+    "platform": "JioCinema",
+    "category": "CONTENT",
+    "reportedBy": "u_9921",
+    "reportedAt": "2026-07-22T02:05:00Z",
+    "resolved": true,
+    "resolution": "Availability synced from source catalog.",
+    "resolvedAt": "2026-07-22T02:50:00Z"
+  },
+  {
+    "id": "r_1019",
+    "title": "Oppenheimer",
+    "platform": "JioCinema",
+    "category": "CONTENT",
+    "reportedBy": "u_7332",
+    "reportedAt": "2026-07-21T22:15:00Z",
+    "resolved": true,
+    "resolution": "Confirmed after manual audit.",
+    "resolvedAt": "2026-07-21T23:00:00Z"
+  },
+  {
+    "id": "r_1020",
+    "title": "Civil War",
+    "platform": "Prime Video",
+    "category": "PLATFORM",
+    "reportedBy": "u_7001",
+    "reportedAt": "2026-07-21T19:45:00Z",
+    "resolved": true,
+    "resolution": "Platform mapping corrected.",
+    "resolvedAt": "2026-07-21T20:35:00Z"
+  },
+  {
+    "id": "r_1021",
+    "title": "Blue Eye Samurai",
+    "platform": null,
+    "category": "OTHER",
+    "reportedBy": "u_1199",
+    "reportedAt": "2026-07-21T17:25:00Z",
+    "resolved": true,
+    "resolution": "Marked as intentionally unavailable.",
+    "resolvedAt": "2026-07-21T18:05:00Z"
+  }
+]

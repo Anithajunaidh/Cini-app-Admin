@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/libs/I18nNavigation';
 
@@ -8,7 +9,7 @@ type NavItem = {
   href: string;
   view: string;
   badge?: number;
-  icon: React.ReactNode;
+  icon: ReactNode;
 };
 
 type NavGroup = {
@@ -47,7 +48,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         label: 'Comment queue',
-        href: '/comments',
+        href: '/dashboard/comments',
         view: 'comments',
         icon: (
           <svg
@@ -65,7 +66,7 @@ const navGroups: NavGroup[] = [
       },
       {
         label: 'Availability reports',
-        href: '/reports',
+        href: '/dashboard/reports',
         view: 'reports',
         icon: (
           <svg
@@ -132,7 +133,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         label: 'Users',
-        href: '/users',
+        href: '/dashboard/users',
         view: 'users',
         icon: (
           <svg
@@ -155,30 +156,23 @@ const navGroups: NavGroup[] = [
 ];
 
 type RailProps = {
-  /** Logged-in admin display name */
   adminName?: string;
-  /** Logged-in admin role string */
   adminRole?: string;
-  /** Badge counts for nav items (keyed by view name) */
   badges?: Record<string, number>;
-  /** Callback fired when a nav link is clicked */
   onNavClick?: () => void;
-  /** When true, renders icon-only mode (no labels, narrower width). Used at md breakpoint. */
   collapsed?: boolean;
 };
 
-/** Fixed sidebar rail with brand, nav groups, and admin user block. */
 export function Rail(props: RailProps) {
   const pathname = usePathname();
 
   function isActive(href: string) {
-    // Match /en/dashboard, /en/platforms, etc.
     return pathname.includes(href);
   }
 
   const adminInitials = (props.adminName ?? 'Admin')
     .split(' ')
-    .map((n) => n[0])
+    .map((name) => name[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
@@ -186,17 +180,16 @@ export function Rail(props: RailProps) {
   if (props.collapsed) {
     return (
       <aside className="sticky top-0 flex h-screen flex-col items-center gap-[6px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[10px] py-[22px]">
-        {/* Brand — icon only */}
         <div className="mb-4 flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[var(--accent-teal)] to-[#2E7D74] font-[family-name:var(--font-mono)] text-[15px] font-semibold text-[#06231F]">
           M
         </div>
 
-        {/* Nav — icon only with title tooltip */}
         <nav className="flex w-full flex-col items-center gap-[2px]" aria-label="Main navigation">
           {navGroups.map((group) =>
             group.items.map((item) => {
               const active = isActive(item.href);
               const badge = props.badges?.[item.view];
+
               return (
                 <Link
                   key={item.view}
@@ -204,27 +197,26 @@ export function Rail(props: RailProps) {
                   onClick={() => props.onNavClick?.()}
                   title={item.label}
                   className={[
-                    'relative flex items-center justify-center w-[44px] h-[44px] rounded-[10px]',
+                    'relative flex h-[44px] w-[44px] items-center justify-center rounded-[10px]',
                     'border transition-[background,color] duration-150',
                     active
-                      ? 'bg-[var(--accent-teal-dim)] text-[var(--accent-teal)] border-[#4FD1C540]'
-                      : 'text-[var(--text-muted)] border-transparent hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+                      ? 'border-[#4FD1C540] bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]'
+                      : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
                   ].join(' ')}
                   aria-current={active ? 'page' : undefined}
                 >
                   <span className="shrink-0 opacity-90 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
-                  {badge !== undefined && (
-                    <span className="absolute -top-[3px] -right-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
+                  {badge !== undefined ? (
+                    <span className="absolute -right-[3px] -top-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
                       {badge > 9 ? '9+' : badge}
                     </span>
-                  )}
+                  ) : null}
                 </Link>
               );
             }),
           )}
         </nav>
 
-        {/* Admin initials — bottom */}
         <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px]">
           <div
             className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)]"
@@ -239,7 +231,6 @@ export function Rail(props: RailProps) {
 
   return (
     <aside className="sticky top-0 flex h-screen flex-col gap-[26px] overflow-y-auto border-r border-[var(--border-soft)] bg-[var(--surface)] px-[14px] py-[22px]">
-      {/* Brand */}
       <div className="flex items-center gap-[10px] px-2">
         <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[var(--accent-teal)] to-[#2E7D74] font-[family-name:var(--font-mono)] text-[13px] font-semibold text-[#06231F]">
           M
@@ -248,43 +239,42 @@ export function Rail(props: RailProps) {
           <div className="font-[family-name:var(--font-display)] text-[15px] font-semibold tracking-[0.2px]">
             MIRALO
           </div>
-          <div className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.6px] text-[var(--text-faint)] uppercase">
+          <div className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.6px] text-[var(--text-faint)]">
             Backoffice
           </div>
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex flex-col gap-[2px]" aria-label="Main navigation">
         {navGroups.map((group) => (
           <div key={group.eyebrow}>
-            <div className="px-[10px] pt-[14px] pb-[6px] font-[family-name:var(--font-mono)] text-[10px] tracking-[1.2px] text-[var(--text-faint)] uppercase">
+            <div className="px-[10px] pb-[6px] pt-[14px] font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[1.2px] text-[var(--text-faint)]">
               {group.eyebrow}
             </div>
             {group.items.map((item) => {
               const active = isActive(item.href);
               const badge = props.badges?.[item.view];
+
               return (
                 <Link
                   key={item.view}
                   href={item.href as any}
                   onClick={() => props.onNavClick?.()}
                   className={[
-                    'flex items-center gap-[10px] px-[10px] py-[9px] rounded-[8px]',
-                    'text-[13px] font-medium border transition-[background,color] duration-150',
+                    'flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[9px] text-[13px] font-medium transition-[background,color] duration-150',
                     active
-                      ? 'bg-[var(--accent-teal-dim)] text-[var(--accent-teal)] border-[#4FD1C540]'
-                      : 'text-[var(--text-muted)] border-transparent hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
+                      ? 'border-[#4FD1C540] bg-[var(--accent-teal-dim)] text-[var(--accent-teal)]'
+                      : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]',
                   ].join(' ')}
                   aria-current={active ? 'page' : undefined}
                 >
                   <span className="shrink-0 opacity-90">{item.icon}</span>
                   <span className="min-w-0 truncate">{item.label}</span>
-                  {badge !== undefined && (
+                  {badge !== undefined ? (
                     <span className="ml-auto shrink-0 rounded-full bg-[var(--accent-amber-dim)] px-[6px] py-[1px] font-[family-name:var(--font-mono)] text-[10px] font-semibold text-[var(--accent-amber)]">
                       {badge}
                     </span>
-                  )}
+                  ) : null}
                 </Link>
               );
             })}
@@ -292,7 +282,6 @@ export function Rail(props: RailProps) {
         ))}
       </nav>
 
-      {/* Admin user block */}
       <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px]">
         <div className="flex items-center gap-[9px]">
           <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)]">
