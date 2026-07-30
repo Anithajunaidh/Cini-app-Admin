@@ -41,12 +41,11 @@ export type AvailabilityReportDto = {
   createdAt: string;
 };
 
-/** Sync status shape from GET /api/v1/admin/sync/status */
 export type SyncStatusDto = {
   /** ISO 8601 string */
   lastTmdbSync: string | null;
   /** Unix epoch seconds */
-  lastAvailSync: number | null;
+  lastAvailabilitySync: number | null;
 };
 
 /** Trigger sync response: 202 */
@@ -55,23 +54,38 @@ export type SyncTriggerResponseDto = {
   triggeredAt: string;
 };
 
-/** DTO for a single platform */
 export type AdminPlatformDto = {
   id: string;
-  name: string;
+  nameEs: string;
   slug: string;
   subscriberCount: number;
-  titleCount: number;
 };
 
-/** Payload for creating a new platform */
 export type CreatePlatformDto = {
-  name: string;
+  nameEs: string;
   slug: string;
+  type: 'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR';
 };
 
-/** Payload for updating a platform */
 export type UpdatePlatformDto = {
-  name?: string;
+  nameEs?: string;
   slug?: string;
+  type?: 'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR';
 };
+
+/** Paginated response from GET /api/v1/admin/comments */
+export type PaginatedCommentsDto = {
+  data: ReportedCommentDto[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+/** Paginated response from GET /api/v1/admin/availability-reports */
+export type PaginatedReportsDto = {
+  data: AvailabilityReportDto[];
+  total: number;
+  page: number;
+  limit: number;
+};
+

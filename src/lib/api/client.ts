@@ -3,16 +3,15 @@ import axios from 'axios';
 import { normalizeApiError } from './errors';
 import type { ApiErrorResponse } from './errors';
 
-function getAccessToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  return localStorage.getItem('access_token');
-}
+
 
 async function refreshAccessToken() {
-  // call refresh endpoint, store new token
+  // Better Auth handles refresh via /api/auth/get-session or token endpoint.
+  // If the session cookie is still valid, hitting sign-in again would re-issue a token.
+  // For now we throw to let the 401 handler fall through to handleLogout().
+  throw new Error('Token refresh not yet implemented — user must sign in again.');
 }
+
 
 function handleLogout() {
   if (typeof window !== 'undefined') {
@@ -21,22 +20,20 @@ function handleLogout() {
   }
 }
 
-// eslint-disable-next-line import/no-named-as-default-member
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000',
+  // With Next.js rewrites, we hit the frontend server which proxies to the backend.
+  baseURL: '/api/v1',
   timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
   },
+  // Ensure cookies are sent on every request
+  withCredentials: true,
 });
 
 // ---- REQUEST INTERCEPTOR ----
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
     return config;
   },
   // eslint-disable-next-line promise/prefer-await-to-callbacks

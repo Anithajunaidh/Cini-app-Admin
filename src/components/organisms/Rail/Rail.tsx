@@ -167,6 +167,9 @@ export function Rail(props: RailProps) {
   const pathname = usePathname();
 
   function isActive(href: string) {
+    if (href === '/dashboard') {
+      return pathname.endsWith('/dashboard') || pathname === href;
+    }
     return pathname.includes(href);
   }
 

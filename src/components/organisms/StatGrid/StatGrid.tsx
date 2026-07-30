@@ -7,7 +7,7 @@ const STAT_SKELETON_COUNT = 5;
 
 /** Renders the 5 stat cards in the Dashboard stats grid. Fetches from GET /admin/stats. */
 export function StatGrid() {
-  const { data: stats, isLoading } = useAdminStats();
+  const { data: stats, isLoading, isError, error } = useAdminStats();
 
   if (isLoading) {
     return (
@@ -23,6 +23,16 @@ export function StatGrid() {
             <div className="h-[11px] w-32 rounded bg-[var(--surface-raised)]" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-[var(--radius)] border border-[var(--accent-red-dim)] bg-[var(--surface)] px-4 py-3">
+        <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--accent-red)]">
+          ⚠ Stats API error — {(error as Error)?.message ?? 'Could not fetch stats. Is the backend running?'}
+        </p>
       </div>
     );
   }

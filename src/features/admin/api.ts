@@ -2,16 +2,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { queryKeys } from '@/lib/query/query-keys';
-import mockData from './mockData.json';
 import type {
   AdminPlatformDto,
   AdminStatsDto,
   AvailabilityReportDto,
   CreatePlatformDto,
   NeedsAttentionItem,
+  PaginatedCommentsDto,
+  PaginatedReportsDto,
   ReportedCommentDto,
   SyncStatusDto,
   SyncTriggerResponseDto,
+  UpdatePlatformDto,
 } from './types';
 
 // =====================================================================
@@ -22,7 +24,11 @@ import type {
 export function useAdminStats() {
   return useQuery({
     queryKey: queryKeys.admin.stats,
-    queryFn: async () => mockData.stats as AdminStatsDto,
+    // The backend wraps responses in { data, meta }
+    queryFn: async () => {
+      const res = await apiClient.get(ENDPOINTS.admin.stats) as { data: AdminStatsDto };
+      return res.data;
+    },
   });
 }
 
@@ -34,8 +40,11 @@ export function useAdminStats() {
 export function useAdminSyncStatus() {
   return useQuery({
     queryKey: queryKeys.admin.syncStatus,
-    queryFn: async () => mockData.syncStatus as SyncStatusDto,
-    // Refetch every 60 seconds so the strip stays fresh
+    queryFn: async () => {
+      const res = await apiClient.get(ENDPOINTS.admin.sync.status) as { data: SyncStatusDto };
+      return res.data;
+    },
+    // Refetch every 60 seconds so the strip stays fresh.
     refetchInterval: 60 * 1000,
   });
 }
@@ -44,10 +53,10 @@ export function useAdminSyncStatus() {
 export function useTriggerSync() {
   return useMutation({
     mutationFn: async (target: 'tmdb' | 'availability') => {
-      const data = await apiClient.post<SyncTriggerResponseDto>(ENDPOINTS.admin.sync.trigger, {
+      const res = (await apiClient.post(ENDPOINTS.admin.sync.trigger, {
         target,
-      });
-      return data;
+      })) as { data: SyncTriggerResponseDto };
+      return res.data;
     },
     onSuccess: () => {
       // Nothing to invalidate immediately; sync completion updates redis keys
@@ -66,18 +75,25 @@ export function useNeedsAttention() {
   return useQuery({
     queryKey: ['admin', 'needs-attention'] as const,
     queryFn: async () => {
-      // const [commentsRes, reportsRes] = await Promise.all([ ... ])
+      const [commentsRes, reportsRes] = await Promise.all([
+        apiClient.get(ENDPOINTS.admin.comments, {
+          params: { status: 'reported', limit: 2 },
+        }) as Promise<PaginatedCommentsDto>,
+        apiClient.get(ENDPOINTS.admin.availabilityReports, {
+          params: { resolved: false, limit: 2 },
+        }) as Promise<PaginatedReportsDto>,
+      ]);
 
-      const commentItems: NeedsAttentionItem[] = mockData.comments.map((c) => ({
+      const commentItems: NeedsAttentionItem[] = commentsRes.data.map((c: ReportedCommentDto) => ({
         id: c.id,
-        source: 'comment',
+        source: 'comment' as const,
         detail: c.text,
         createdAt: c.createdAt,
       }));
 
-      const reportItems: NeedsAttentionItem[] = mockData.reports.map((r) => ({
+      const reportItems: NeedsAttentionItem[] = reportsRes.data.map((r: AvailabilityReportDto) => ({
         id: r.id,
-        source: 'avail. report',
+        source: 'avail. report' as const,
         detail: `${r.titleName} — marked unavailable on ${r.platform ?? 'unknown'}`,
         createdAt: r.createdAt,
       }));
@@ -97,7 +113,10 @@ export function useNeedsAttention() {
 export function usePlatforms() {
   return useQuery({
     queryKey: queryKeys.admin.platforms.list(),
-    queryFn: async () => mockData.platforms as AdminPlatformDto[],
+    queryFn: async () => {
+      const res = await apiClient.get(ENDPOINTS.admin.platforms.list) as { data: AdminPlatformDto[] };
+      return res.data;
+    },
   });
 }
 
@@ -107,11 +126,26 @@ export function useCreatePlatform() {
 
   return useMutation({
     mutationFn: async (payload: CreatePlatformDto) => {
-      const data = await apiClient.post<AdminPlatformDto>(
-        ENDPOINTS.admin.platforms.list,
+      const res = (await apiClient.post(ENDPOINTS.admin.platforms.list, payload)) as { data: AdminPlatformDto };
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.platforms.all });
+    },
+  });
+}
+
+/** Updates an existing platform by id. Invalidates the platform list. */
+export function useUpdatePlatform() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: string; payload: UpdatePlatformDto }) => {
+      const res = (await apiClient.patch(
+        ENDPOINTS.admin.platforms.detail(id),
         payload,
-      );
-      return data;
+      )) as { data: AdminPlatformDto };
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.platforms.all });

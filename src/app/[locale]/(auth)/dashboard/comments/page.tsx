@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
-import { AdminLayout } from '@/components/templates/AdminLayout';
+import { AdminLayout } from '@/templates/AdminLayout';
 import {
   adminCommentQueue,
   filterCommentQueueRows,

@@ -21,6 +21,18 @@ const aj = arcjet.withRule(
   }),
 );
 
+/**
+ * Pathname segments that require an authenticated session.
+ * Checked after stripping the locale prefix (e.g. /en/dashboard → /dashboard).
+ */
+const PROTECTED_SEGMENTS = ['/dashboard', '/platforms', '/sync', '/users', '/comments', '/reports'];
+
+function isProtectedPath(pathname: string): boolean {
+  // Strip locale prefix: /en/dashboard → /dashboard
+  const withoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '') || '/';
+  return PROTECTED_SEGMENTS.some((seg) => withoutLocale === seg || withoutLocale.startsWith(`${seg}/`));
+}
+
 export default async function proxy(request: NextRequest) {
   // Verify the request with Arcjet
   // Use `process.env` instead of Env to reduce bundle size in middleware
@@ -32,9 +44,17 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Let local development bypass auth checks so the dashboard can be verified directly.
-  if (process.env.NODE_ENV === 'development') {
-    return handleI18nRouting(request);
+  const { pathname } = request.nextUrl;
+
+  // Route guard — only enforced in production.
+  // In development, the dashboard can be accessed directly to speed up iteration.
+  if (process.env.NODE_ENV !== 'development' && isProtectedPath(pathname)) {
+    const token = request.cookies.get('access_token')?.value;
+    if (!token) {
+      const signInUrl = request.nextUrl.clone();
+      signInUrl.pathname = '/sign-in';
+      return NextResponse.redirect(signInUrl);
+    }
   }
 
   return handleI18nRouting(request);

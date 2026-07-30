@@ -46,8 +46,8 @@ export function SyncPulseStrip() {
     : '—';
 
   const availValue =
-    syncStatus?.lastAvailSync != null
-      ? `epoch ${syncStatus.lastAvailSync} · ${formatRelativeTime(Date.now() - syncStatus.lastAvailSync * 1000)}`
+    syncStatus?.lastAvailabilitySync != null
+      ? `epoch ${syncStatus.lastAvailabilitySync} · ${formatRelativeTime(Date.now() - syncStatus.lastAvailabilitySync * 1000)}`
       : '—';
 
   function handleTriggerSync() {
@@ -68,7 +68,7 @@ export function SyncPulseStrip() {
         <PulseCell
           title="last-avail-sync"
           value={availValue}
-          color={availSyncColor(syncStatus?.lastAvailSync ?? null)}
+          color={availSyncColor(syncStatus?.lastAvailabilitySync ?? null)}
         />
       </div>
 
