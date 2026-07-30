@@ -1,17 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
 import { AdminLayout } from '@/components/templates/AdminLayout';
 import {
-  adminAvailabilityReports,
-  filterAvailabilityReportsRows,
-  type AdminAvailabilityReport,
-  type AvailabilityFilter,
-} from '@/data/admin-moderation';
-import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
+  useAdminAvailabilityReports,
+  useResolveAvailabilityReport,
+} from '@/features/admin/api';
+import { useAdminDebouncedSearchQuery } from '@/hooks/useAdminSearch';
 
 const FILTER_TABS: { label: string; value: AvailabilityFilter }[] = [
   { label: 'Unresolved', value: 'unresolved' },
@@ -20,6 +19,8 @@ const FILTER_TABS: { label: string; value: AvailabilityFilter }[] = [
 ];
 
 const LIMIT = 5;
+
+type AvailabilityFilter = 'unresolved' | 'resolved' | 'all';
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
@@ -40,7 +41,7 @@ function formatRelativeAge(value: string) {
   return `${diffDays}d`;
 }
 
-function getCategoryVariant(report: AdminAvailabilityReport) {
+function getCategoryVariant(report: { resolved: boolean; category: string }) {
   if (report.resolved) {
     return 'resolved' as const;
   }
@@ -52,6 +53,14 @@ function getCategoryVariant(report: AdminAvailabilityReport) {
   return 'active-role' as const;
 }
 
+function getReportErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
+  return 'Something went wrong while resolving this report.';
+}
+
 export default function AvailabilityReportsPage() {
   return (
     <AdminLayout eyebrow="Moderation" title="Availability reports">
@@ -61,20 +70,31 @@ export default function AvailabilityReportsPage() {
 }
 
 function AvailabilityReportsPanel() {
-  const [reports, setReports] = useState<AdminAvailabilityReport[]>(adminAvailabilityReports);
   const [activeFilter, setActiveFilter] = useState<AvailabilityFilter>('unresolved');
   const [page, setPage] = useState(1);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [resolutionDraft, setResolutionDraft] = useState('');
   const [expandedReportId, setExpandedReportId] = useState<string | null>(null);
-  const searchQuery = useAdminSearchQuery();
+  const [actionError, setActionError] = useState<string | null>(null);
+  const searchQuery = useAdminDebouncedSearchQuery();
+  const reportsQuery = useAdminAvailabilityReports({
+    page,
+    limit: LIMIT,
+    resolved:
+      activeFilter === 'unresolved'
+        ? 'false'
+        : activeFilter === 'resolved'
+          ? 'true'
+          : 'all',
+    query: searchQuery,
+  });
+  const resolveReport = useResolveAvailabilityReport();
 
-  const filteredReports = filterAvailabilityReportsRows(reports, activeFilter, searchQuery);
-  const total = filteredReports.length;
+  const total = reportsQuery.data?.meta.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
-  const pageRows = filteredReports.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const selectedReport = reports.find(function(report) {
+  const pageRows = reportsQuery.data?.data ?? [];
+  const selectedReport = pageRows.find(function(report) {
     return report.id === selectedReportId;
   });
 
@@ -84,7 +104,22 @@ function AvailabilityReportsPanel() {
       : activeFilter === 'resolved'
         ? `${total} resolved`
         : `${total} total`;
-  const hasSearchQuery = searchQuery.trim().length > 0;
+
+  useEffect(
+    function() {
+      if (page > totalPages) {
+        setPage(totalPages);
+      }
+    },
+    [page, totalPages],
+  );
+
+  useEffect(
+    function() {
+      setPage(1);
+    },
+    [searchQuery, activeFilter],
+  );
 
   function handleFilterChange(filter: AvailabilityFilter) {
     setActiveFilter(filter);
@@ -92,11 +127,16 @@ function AvailabilityReportsPanel() {
     setSelectedReportId(null);
     setResolutionDraft('');
     setExpandedReportId(null);
+    setActionError(null);
   }
 
-  function handleOpenResolve(report: AdminAvailabilityReport) {
-    setSelectedReportId(report.id);
-    setResolutionDraft(report.resolution ?? '');
+  function handleOpenResolve(reportId: string) {
+    setSelectedReportId(reportId);
+    const match = pageRows.find(function(report) {
+      return report.id === reportId;
+    });
+    setResolutionDraft(match?.resolution ?? '');
+    setActionError(null);
   }
 
   function handleSaveResolve() {
@@ -105,26 +145,24 @@ function AvailabilityReportsPanel() {
     }
 
     const trimmedNote = resolutionDraft.trim();
+    setActionError(null);
 
-    setReports(function(previousReports) {
-      return previousReports.map(function(report) {
-        if (report.id !== selectedReportId) {
-          return report;
-        }
-
-        return {
-          ...report,
-          resolved: true,
-          resolution: trimmedNote.length > 0 ? trimmedNote : 'Resolved without an extra note.',
-          resolvedAt: new Date().toISOString(),
-        };
-      });
-    });
-
-    setSelectedReportId(null);
-    setResolutionDraft('');
-    setExpandedReportId(null);
-    setPage(1);
+    resolveReport.mutate(
+      {
+        id: selectedReportId,
+        resolution: trimmedNote.length > 0 ? trimmedNote : undefined,
+      },
+      {
+        onSuccess() {
+          setSelectedReportId(null);
+          setResolutionDraft('');
+          setExpandedReportId(null);
+        },
+        onError(error) {
+          setActionError(getReportErrorMessage(error));
+        },
+      },
+    );
   }
 
   function handleToggleExpanded(reportId: string) {
@@ -133,8 +171,20 @@ function AvailabilityReportsPanel() {
     });
   }
 
-  function getResolvedText(report: AdminAvailabilityReport) {
+  function getResolvedText(report: { resolution: string | null }) {
     return report.resolution ?? 'Marked as resolved';
+  }
+
+  if (reportsQuery.isError) {
+    return (
+      <div className="panel">
+        <div className="px-[18px] py-[20px] text-[13px] text-[color:var(--accent-red)]">
+          {reportsQuery.error instanceof ApiError
+            ? reportsQuery.error.message
+            : 'Unable to load the availability reports.'}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -142,7 +192,9 @@ function AvailabilityReportsPanel() {
       <div className="panel-head">
         <div className="panel-heading">
           <span className="panel-title">Availability reports</span>
-          <span className="panel-count">{countCaption}</span>
+          <span className="panel-count">
+            {reportsQuery.isLoading ? 'Loading…' : countCaption}
+          </span>
         </div>
 
         <div className="filter-row">
@@ -163,6 +215,12 @@ function AvailabilityReportsPanel() {
           })}
         </div>
       </div>
+
+      {actionError ? (
+        <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[12px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--accent-red)]">
+          {actionError}
+        </div>
+      ) : null}
 
       {selectedReport ? (
         <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[16px]">
@@ -187,8 +245,14 @@ function AvailabilityReportsPanel() {
               >
                 Cancel
               </button>
-              <button suppressHydrationWarning className="btn-ghost" onClick={handleSaveResolve} type="button">
-                Save
+              <button
+                suppressHydrationWarning
+                className="btn-ghost"
+                disabled={resolveReport.isPending}
+                onClick={handleSaveResolve}
+                type="button"
+              >
+                {resolveReport.isPending ? 'Saving…' : 'Save'}
               </button>
             </div>
           </div>
@@ -205,14 +269,14 @@ function AvailabilityReportsPanel() {
         </div>
       ) : null}
 
-      {pageRows.length === 0 ? (
+      {reportsQuery.isLoading ? (
+        <div className="px-[18px] py-[24px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--text-faint)]">
+          Loading availability reports…
+        </div>
+      ) : pageRows.length === 0 ? (
         <EmptyState
           title="No reports found"
-          subtitle={
-            hasSearchQuery
-              ? 'No availability reports match this search.'
-              : 'There are no availability reports for this filter.'
-          }
+          subtitle="There are no availability reports for this filter."
         />
       ) : (
         <>
@@ -270,7 +334,7 @@ function AvailabilityReportsPanel() {
                             suppressHydrationWarning
                             className="btn-ghost"
                             onClick={function() {
-                              handleOpenResolve(report);
+                              handleOpenResolve(report.id);
                             }}
                             type="button"
                           >

@@ -1,21 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
 import { AdminLayout } from '@/components/templates/AdminLayout';
 import {
+  useAdminUsers,
+  useSuspendAdminUser,
+  useUpdateAdminUserRole,
+} from '@/features/admin/api';
+import { useAdminDebouncedSearchQuery } from '@/hooks/useAdminSearch';
+import {
   ADMIN_USER_ROLES,
   CURRENT_ADMIN_ID,
-  adminUsers,
-  filterAdminUsers,
   getRoleBadgeVariant,
-  type AdminUser,
   type AdminUserRole,
   type UsersFilter,
 } from '@/data/admin-users';
-import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
 
 const FILTER_TABS: { label: string; value: UsersFilter }[] = [
   { label: 'All roles', value: 'all' },
@@ -32,20 +35,34 @@ function formatTotalCount(total: number) {
   return total.toLocaleString('en-US');
 }
 
+function getUserErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
+  return 'Something went wrong while updating this user.';
+}
+
 function UsersPanel() {
-  const searchQuery = useAdminSearchQuery();
-  const [users, setUsers] = useState<AdminUser[]>(adminUsers);
   const [activeFilter, setActiveFilter] = useState<UsersFilter>('all');
   const [page, setPage] = useState(1);
   const [roleEditorUserId, setRoleEditorUserId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const searchQuery = useAdminDebouncedSearchQuery();
+  const usersQuery = useAdminUsers({
+    page,
+    limit: LIMIT,
+    suspended: activeFilter === 'suspended' ? 'true' : 'all',
+    query: searchQuery,
+  });
+  const updateUserRole = useUpdateAdminUserRole();
+  const suspendUser = useSuspendAdminUser();
 
-  const filteredUsers = filterAdminUsers(users, activeFilter, searchQuery);
-  const total = filteredUsers.length;
+  const total = usersQuery.data?.meta.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
-  const pageRows = filteredUsers.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const roleEditorUser = users.find(function(user) {
+  const pageRows = usersQuery.data?.data ?? [];
+  const roleEditorUser = pageRows.find(function(user) {
     return user.id === roleEditorUserId;
   });
 
@@ -54,6 +71,22 @@ function UsersPanel() {
       ? `${formatTotalCount(total)} suspended`
       : `${formatTotalCount(total)} total`;
 
+  useEffect(
+    function() {
+      if (page > totalPages) {
+        setPage(totalPages);
+      }
+    },
+    [page, totalPages],
+  );
+
+  useEffect(
+    function() {
+      setPage(1);
+    },
+    [searchQuery, activeFilter],
+  );
+
   function handleFilterChange(filter: UsersFilter) {
     setActiveFilter(filter);
     setPage(1);
@@ -61,14 +94,9 @@ function UsersPanel() {
     setActionError(null);
   }
 
-  function handleOpenRoleEditor(user: AdminUser) {
-    if (user.id === CURRENT_ADMIN_ID) {
-      setActionError('Cannot change own role');
-      return;
-    }
-
+  function handleOpenRoleEditor(userId: string) {
     setActionError(null);
-    setRoleEditorUserId(user.id);
+    setRoleEditorUserId(userId);
   }
 
   function handleChangeRole(userId: string, role: AdminUserRole) {
@@ -78,43 +106,49 @@ function UsersPanel() {
       return;
     }
 
-    setUsers(function(previousUsers) {
-      return previousUsers.map(function(user) {
-        if (user.id !== userId) {
-          return user;
-        }
-
-        return {
-          ...user,
-          role,
-        };
-      });
-    });
-
-    setRoleEditorUserId(null);
     setActionError(null);
+
+    updateUserRole.mutate(
+      { id: userId, role },
+      {
+        onSuccess() {
+          setRoleEditorUserId(null);
+        },
+        onError(error) {
+          setActionError(getUserErrorMessage(error));
+        },
+      },
+    );
   }
 
-  function handleToggleSuspended(userId: string) {
+  function handleSuspendUser(userId: string) {
     if (userId === CURRENT_ADMIN_ID) {
       setActionError('Cannot suspend your own account');
       return;
     }
 
-    setUsers(function(previousUsers) {
-      return previousUsers.map(function(user) {
-        if (user.id !== userId) {
-          return user;
-        }
-
-        return {
-          ...user,
-          suspended: !user.suspended,
-        };
-      });
-    });
-
     setActionError(null);
+
+    suspendUser.mutate(
+      { id: userId },
+      {
+        onError(error) {
+          setActionError(getUserErrorMessage(error));
+        },
+      },
+    );
+  }
+
+  if (usersQuery.isError) {
+    return (
+      <div className="panel">
+        <div className="px-[18px] py-[20px] text-[13px] text-[color:var(--accent-red)]">
+          {usersQuery.error instanceof ApiError
+            ? usersQuery.error.message
+            : 'Unable to load the users list.'}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -122,7 +156,7 @@ function UsersPanel() {
       <div className="panel-head">
         <div className="panel-heading">
           <span className="panel-title">Users</span>
-          <span className="panel-count">{countCaption}</span>
+          <span className="panel-count">{usersQuery.isLoading ? 'Loading…' : countCaption}</span>
         </div>
 
         <div className="filter-row">
@@ -169,7 +203,7 @@ function UsersPanel() {
                     key={role}
                     suppressHydrationWarning
                     className="btn-ghost"
-                    disabled={role === roleEditorUser.role}
+                    disabled={role === roleEditorUser.role || updateUserRole.isPending}
                     onClick={function() {
                       handleChangeRole(roleEditorUser.id, role);
                     }}
@@ -193,15 +227,12 @@ function UsersPanel() {
         </div>
       ) : null}
 
-      {pageRows.length === 0 ? (
-        <EmptyState
-          title="No users found"
-          subtitle={
-            searchQuery.trim().length > 0
-              ? 'No users match this search.'
-              : 'There are no users for this filter.'
-          }
-        />
+      {usersQuery.isLoading ? (
+        <div className="px-[18px] py-[24px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--text-faint)]">
+          Loading users…
+        </div>
+      ) : pageRows.length === 0 ? (
+        <EmptyState title="No users found" subtitle="There are no users for this filter." />
       ) : (
         <>
           <table>
@@ -226,7 +257,7 @@ function UsersPanel() {
                         {isOwnRow ? ' (you)' : null}
                       </div>
                       <div className="cell-sub">
-                        id: {user.id} · {user.email}
+                        id: {user.id} Â· {user.email}
                       </div>
                     </td>
                     <td>
@@ -255,8 +286,9 @@ function UsersPanel() {
                             <button
                               suppressHydrationWarning
                               className="btn-ghost"
+                              disabled={updateUserRole.isPending}
                               onClick={function() {
-                                handleOpenRoleEditor(user);
+                                handleOpenRoleEditor(user.id);
                               }}
                               type="button"
                             >
@@ -265,8 +297,9 @@ function UsersPanel() {
                             <button
                               suppressHydrationWarning
                               className={`btn-ghost${user.suspended ? '' : ' danger'}`}
+                              disabled={suspendUser.isPending}
                               onClick={function() {
-                                handleToggleSuspended(user.id);
+                                handleSuspendUser(user.id);
                               }}
                               type="button"
                             >
