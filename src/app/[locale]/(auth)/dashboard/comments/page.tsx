@@ -5,12 +5,8 @@ import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
 import { AdminLayout } from '@/components/templates/AdminLayout';
-import {
-  adminCommentQueue,
-  filterCommentQueueRows,
-  type AdminComment,
-  type CommentFilter,
-} from '@/data/admin-moderation';
+import { adminCommentQueue, filterCommentQueueRows } from '@/data/admin-moderation';
+import type { AdminComment, CommentFilter } from '@/data/admin-moderation';
 import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
 
 const FILTER_TABS: { label: string; value: CommentFilter }[] = [
@@ -23,7 +19,7 @@ const LIMIT = 5;
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
-  const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
+  const diffMinutes = Math.max(0, Math.floor(diffMs / 60_000));
 
   if (diffMinutes < 60) {
     return `${Math.max(1, diffMinutes)}m`;
@@ -63,9 +59,9 @@ function CommentQueuePanel() {
   const countCaption =
     activeFilter === 'reported'
       ? `${total} reported`
-      : activeFilter === 'hidden'
+      : (activeFilter === 'hidden'
         ? `${total} hidden`
-        : `${total} total`;
+        : `${total} total`);
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   function handleFilterChange(filter: CommentFilter) {
@@ -74,8 +70,8 @@ function CommentQueuePanel() {
   }
 
   function handleToggleHidden(commentId: string) {
-    setComments(function(previousComments) {
-      return previousComments.map(function(comment) {
+    setComments(function (previousComments) {
+      return previousComments.map(function (comment) {
         if (comment.id !== commentId) {
           return comment;
         }
@@ -97,13 +93,13 @@ function CommentQueuePanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {FILTER_TABS.map(function (tab) {
             return (
               <button
                 key={tab.value}
                 suppressHydrationWarning
                 className={`chip${activeFilter === tab.value ? ' active' : ''}`}
-                onClick={function() {
+                onClick={function () {
                   handleFilterChange(tab.value);
                 }}
                 type="button"
@@ -118,7 +114,11 @@ function CommentQueuePanel() {
       {pageRows.length === 0 ? (
         <EmptyState
           title="No comments found"
-          subtitle={hasSearchQuery ? 'No comments match this search.' : 'There are no comments for this filter.'}
+          subtitle={
+            hasSearchQuery
+              ? 'No comments match this search.'
+              : 'There are no comments for this filter.'
+          }
         />
       ) : (
         <>
@@ -133,7 +133,7 @@ function CommentQueuePanel() {
               </tr>
             </thead>
             <tbody>
-              {pageRows.map(function(comment) {
+              {pageRows.map(function (comment) {
                 return (
                   <tr key={comment.id}>
                     <td>
@@ -150,13 +150,15 @@ function CommentQueuePanel() {
                     </td>
                     <td className="cell-mono">{comment.userId}</td>
                     <td>{comment.titleName ?? comment.titleId}</td>
-                    <td className="cell-mono">{formatRelativeAge(comment.reportedAt ?? comment.createdAt)}</td>
+                    <td className="cell-mono">
+                      {formatRelativeAge(comment.reportedAt ?? comment.createdAt)}
+                    </td>
                     <td>
                       <div className="row-actions">
                         <button
                           suppressHydrationWarning
                           className={`btn-ghost${comment.hidden ? '' : ' danger'}`}
-                          onClick={function() {
+                          onClick={function () {
                             handleToggleHidden(comment.id);
                           }}
                           type="button"
@@ -171,7 +173,12 @@ function CommentQueuePanel() {
             </tbody>
           </table>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination
+            page={safePage}
+            totalPages={totalPages}
+            limit={LIMIT}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

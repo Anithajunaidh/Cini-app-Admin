@@ -1,8 +1,8 @@
-import commentQueueData from '@/data/admin-comment-queue.json';
 import availabilityReportsData from '@/data/admin-availability-reports.json';
+import commentQueueData from '@/data/admin-comment-queue.json';
 import { matchSearchQuery } from '@/lib/search/matchSearchQuery';
 
-export interface AdminComment {
+export type AdminComment = {
   id: string;
   text: string;
   hidden: boolean;
@@ -14,7 +14,7 @@ export interface AdminComment {
   reportedAt?: string;
 }
 
-export interface AdminAvailabilityReport {
+export type AdminAvailabilityReport = {
   id: string;
   title: string;
   platform: string | null;
@@ -62,9 +62,8 @@ export function getAvailabilityReportCounts() {
  * @returns Filtered comments in descending recency order.
  */
 export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilter, query = '') {
-  return rows
-    .slice()
-    .filter(function(comment) {
+  return [...rows]
+    .filter(function (comment) {
       if (filter === 'reported') {
         if (comment.hidden) {
           return false;
@@ -83,8 +82,11 @@ export function filterCommentQueueRows(rows: AdminComment[], filter: CommentFilt
         comment.titleId,
       ]);
     })
-    .sort(function(left, right) {
-      return new Date(right.reportedAt ?? right.createdAt).getTime() - new Date(left.reportedAt ?? left.createdAt).getTime();
+    .toSorted(function (left, right) {
+      return (
+        new Date(right.reportedAt ?? right.createdAt).getTime() -
+        new Date(left.reportedAt ?? left.createdAt).getTime()
+      );
     });
 }
 
@@ -100,9 +102,8 @@ export function filterAvailabilityReportsRows(
   filter: AvailabilityFilter,
   query = '',
 ) {
-  return rows
-    .slice()
-    .filter(function(report) {
+  return [...rows]
+    .filter(function (report) {
       if (filter === 'unresolved') {
         if (report.resolved) {
           return false;
@@ -121,7 +122,7 @@ export function filterAvailabilityReportsRows(
         report.resolution,
       ]);
     })
-    .sort(function(left, right) {
+    .toSorted(function (left, right) {
       return new Date(right.reportedAt).getTime() - new Date(left.reportedAt).getTime();
     });
 }

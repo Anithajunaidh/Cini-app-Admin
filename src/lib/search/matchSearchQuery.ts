@@ -13,17 +13,14 @@ export function normalizeSearchQuery(query: string) {
  * @param fields - String fields to search against.
  * @returns Whether the record matches the query.
  */
-export function matchSearchQuery(
-  query: string,
-  fields: Array<string | null | undefined>,
-) {
+export function matchSearchQuery(query: string, fields: (string | null | undefined)[]) {
   const normalized = normalizeSearchQuery(query);
 
   if (normalized.length === 0) {
     return true;
   }
 
-  return fields.some(function(field) {
+  return fields.some(function (field) {
     if (field == null || field.length === 0) {
       return false;
     }

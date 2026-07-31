@@ -1,0 +1,100 @@
+
+> lint
+> ultracite check --type-aware --type-check
+
+Checking formatting...
+
+src/features/test-users/types.ts (0ms)
+src/lib/api/client.ts (0ms)
+src/lib/query/query-client.ts (0ms)
+
+Format issues found in above 3 files. Run without `--check` to fix.
+Finished in 621ms on 91 files using 12 threads.
+
+  x typescript(consistent-type-definitions): Use `type` instead of `interface`.
+    ,-[src/lib/api/errors.ts:22:1]
+ 21 | 
+ 22 | interface ApiErrorResponse {
+    : ^^^^^^^^^
+ 23 |   message?: string;
+    `----
+  help: Replace `interface ApiErrorResponse {
+          message?: string;
+          code?: string;
+          errors?: Record<string, string[]>;
+        }` with `type ApiErrorResponse = {
+          message?: string;
+          code?: string;
+          errors?: Record<string, string[]>;
+        }`.
+
+  x import(no-named-as-default-member): "axios" also has a named export "create"
+    ,-[src/lib/api/client.ts:21:26]
+ 20 | 
+ 21 | export const apiClient = axios.create({
+    :                          ^^^^^^^^^^^^
+ 22 |   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    `----
+  help: Check if you meant to write `import { create } from "axios"`
+
+  x promise(prefer-await-to-callbacks): Prefer `async`/`await` to the callback pattern
+    ,-[src/lib/api/client.ts:38:3]
+ 37 |       },
+ 38 | ,->   (error) => {
+ 39 | |       throw error;
+ 40 | `->   },
+ 41 |     );
+    `----
+  help: Refactor to use an `async` function with `await` instead of passing callbacks for cleaner error handling and control flow.
+
+  x promise(prefer-await-to-callbacks): Prefer `async`/`await` to the callback pattern
+    ,-[src/lib/api/client.ts:46:3]
+ 45 |       (response) => response,
+ 46 | ,->   async (error: AxiosError) => {
+ 47 | |       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+ 48 | |   
+ 49 | |       // Example: auto-refresh token on 401, retry once
+ 50 | |       if (error.response?.status === 401 && !originalRequest._retry) {
+ 51 | |         originalRequest._retry = true;
+ 52 | |         try {
+ 53 | |           await refreshAccessToken(); // implement per your auth strategy
+ 54 | |           return await apiClient(originalRequest);
+ 55 | |         } catch {
+ 56 | |           handleLogout(); // clear session, redirect to /login
+ 57 | |           throw normalizeApiError(error);
+ 58 | |         }
+ 59 | |       }
+ 60 | |   
+ 61 | |       // Every other error is normalized here, ONCE, centrally.
+ 62 | |       throw normalizeApiError(error);
+ 63 | `->   },
+ 64 |     );
+    `----
+  help: Refactor to use an `async` function with `await` instead of passing callbacks for cleaner error handling and control flow.
+
+  x typescript(TS2345): Argument of type 'AxiosError<unknown, any>' is not assignable to parameter of type 'AxiosError<ApiErrorResponse, any>'.
+    ,-[src/lib/api/client.ts:57:33]
+ 56 |         handleLogout(); // clear session, redirect to /login
+ 57 |         throw normalizeApiError(error);
+    :                                 ^^^^^
+ 58 |       }
+    `----
+
+  x typescript(TS2345): Argument of type 'AxiosError<unknown, any>' is not assignable to parameter of type 'AxiosError<ApiErrorResponse, any>'.
+    ,-[src/lib/api/client.ts:62:29]
+ 61 |     // Every other error is normalized here, ONCE, centrally.
+ 62 |     throw normalizeApiError(error);
+    :                             ^^^^^
+ 63 |   },
+    `----
+
+  x typescript(no-unsafe-type-assertion): Unsafe type assertion: type 'InternalAxiosRequestConfig<any> & { _retry?: boolean | undefined; }' is more narrow than the original type.
+    ,-[src/lib/api/client.ts:47:29]
+ 46 |   async (error: AxiosError) => {
+ 47 |     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    :                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 48 | 
+    `----
+
+Found 0 warnings and 7 errors.
+Finished in 863ms on 71 files with 569 rules using 12 threads.

@@ -107,10 +107,7 @@ export function useCreatePlatform() {
 
   return useMutation({
     mutationFn: async (payload: CreatePlatformDto) => {
-      const data = await apiClient.post<AdminPlatformDto>(
-        ENDPOINTS.admin.platforms.list,
-        payload,
-      );
+      const data = await apiClient.post<AdminPlatformDto>(ENDPOINTS.admin.platforms.list, payload);
       return data;
     },
     onSuccess: () => {

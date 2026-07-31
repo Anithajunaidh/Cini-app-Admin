@@ -1,4 +1,4 @@
-interface EmptyStateProps {
+type EmptyStateProps = {
   title: string;
   subtitle: string;
 }
