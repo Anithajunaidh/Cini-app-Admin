@@ -89,3 +89,29 @@ export type PaginatedReportsDto = {
   limit: number;
 };
 
+/** Payload for PATCH /api/v1/admin/availability-reports/:id/resolve */
+export type ResolveReportDto = {
+  resolution?: string;
+};
+
+/** Role values for admin users */
+export type UserRole = 'USER' | 'MODERATOR' | 'ADMIN';
+
+/** DTO returned by GET /api/v1/admin/users */
+export type AdminUserDto = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  /** ISO date string; null when account is active */
+  suspendedAt: string | null;
+  createdAt: string;
+};
+
+/** Paginated response from GET /api/v1/admin/users */
+export type PaginatedUsersDto = {
+  data: AdminUserDto[];
+  total: number;
+  page: number;
+  limit: number;
+};

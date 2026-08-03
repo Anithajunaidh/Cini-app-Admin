@@ -31,7 +31,8 @@ export function StatGrid() {
     return (
       <div className="rounded-[var(--radius)] border border-[var(--accent-red-dim)] bg-[var(--surface)] px-4 py-3">
         <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--accent-red)]">
-          ⚠ Stats API error — {(error as Error)?.message ?? 'Could not fetch stats. Is the backend running?'}
+          ⚠ Stats API error —{' '}
+          {(error)?.message ?? 'Could not fetch stats. Is the backend running?'}
         </p>
       </div>
     );

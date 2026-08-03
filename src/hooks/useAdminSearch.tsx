@@ -1,13 +1,8 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { usePathname } from '@/libs/I18nNavigation';
 
@@ -57,7 +52,7 @@ export function AdminSearchProvider(props: { children: ReactNode }) {
     }
 
     window.addEventListener('popstate', handlePopState);
-    return function() {
+    return function () {
       window.removeEventListener('popstate', handlePopState);
     };
   }, []);

@@ -3,21 +3,21 @@
 @import 'tailwindcss';
 
 :root {
-  --bg-deep: #0F1720;
+  --bg-deep: #0f1720;
   --surface: #172230;
-  --surface-raised: #1F2D3D;
+  --surface-raised: #1f2d3d;
   --surface-hover: #24344680;
   --border: #263444;
-  --border-soft: #1D2A38;
-  --text-primary: #E8EDF2;
-  --text-muted: #8CA0B3;
+  --border-soft: #1d2a38;
+  --text-primary: #e8edf2;
+  --text-muted: #8ca0b3;
   --text-faint: #526376;
-  --accent-amber: #F0A84B;
-  --accent-amber-dim: #F0A84B26;
-  --accent-teal: #4FD1C5;
-  --accent-teal-dim: #4FD1C526;
-  --accent-red: #E5646A;
-  --accent-red-dim: #E5646A22;
+  --accent-amber: #f0a84b;
+  --accent-amber-dim: #f0a84b26;
+  --accent-teal: #4fd1c5;
+  --accent-teal-dim: #4fd1c526;
+  --accent-red: #e5646a;
+  --accent-red-dim: #e5646a22;
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
@@ -90,14 +90,14 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--accent-teal), #2E7D74);
+  background: linear-gradient(135deg, var(--accent-teal), #2e7d74);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 13px;
-  color: #06231F;
+  color: #06231f;
   flex: none;
 }
 
@@ -141,7 +141,9 @@
   font-size: 13px;
   font-weight: 500;
   border: 1px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .nav-item:hover {
@@ -152,7 +154,7 @@
 .nav-item.active {
   background: var(--accent-teal-dim);
   color: var(--accent-teal);
-  border-color: #4FD1C540;
+  border-color: #4fd1c540;
 }
 
 .nav-item svg {
@@ -330,7 +332,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .btn-sync:hover {
@@ -450,7 +454,7 @@
 .chip.active {
   background: var(--accent-teal-dim);
   color: var(--accent-teal);
-  border-color: #4FD1C540;
+  border-color: #4fd1c540;
 }
 
 table {
@@ -533,7 +537,7 @@ tbody tr:hover {
 }
 
 .badge.active-role {
-  background: #8CA0B322;
+  background: #8ca0b322;
   color: var(--text-muted);
 }
 
@@ -561,7 +565,9 @@ tbody tr:hover {
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .btn-ghost:hover {

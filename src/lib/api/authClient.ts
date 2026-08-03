@@ -8,14 +8,17 @@
  */
 // eslint-disable-next-line import/no-named-as-default-member
 import axios from 'axios';
+import type { AxiosError } from 'axios';
 import { normalizeApiError } from './errors';
 import type { ApiErrorResponse } from './errors';
-import type { AxiosError } from 'axios';
 
 const AUTH_BASE =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_AUTH_BASE_URL
     ? process.env.NEXT_PUBLIC_AUTH_BASE_URL
-    : (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000').replace(/\/api\/v1\/?$/, '');
+    : (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000').replace(
+        /\/api\/v1\/?$/,
+        '',
+      );
 
 // eslint-disable-next-line import/no-named-as-default-member
 export const authClient = axios.create({

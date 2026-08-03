@@ -42,7 +42,6 @@ export function NeedsAttentionTable() {
   const router = useRouter();
   const { data: items = [], isLoading, isError, error } = useNeedsAttention();
 
-
   function handleReview() {
     // All Review buttons navigate to Comment Queue (per spec)
     router.push('/comments');
@@ -58,11 +57,10 @@ export function NeedsAttentionTable() {
       ) : isError ? (
         <div className="px-[18px] py-3">
           <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--accent-red)]">
-            ⚠ API error — {(error as Error)?.message ?? 'Could not fetch attention items.'}
+            ⚠ API error — {(error)?.message ?? 'Could not fetch attention items.'}
           </p>
         </div>
-      ) : (items.length === 0 ? (
-
+      ) : items.length === 0 ? (
         <EmptyState
           title="Nothing needs attention"
           sub="All reported comments and availability reports are resolved."
@@ -93,7 +91,7 @@ export function NeedsAttentionTable() {
             </tr>
           ))}
         </DataTable>
-      ))}
+      )}
     </Panel>
   );
 }

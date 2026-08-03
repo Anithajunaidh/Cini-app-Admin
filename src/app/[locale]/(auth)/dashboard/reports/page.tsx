@@ -4,14 +4,10 @@ import { useState } from 'react';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
-import { AdminLayout } from '@/templates/AdminLayout';
-import {
-  adminAvailabilityReports,
-  filterAvailabilityReportsRows,
-  type AdminAvailabilityReport,
-  type AvailabilityFilter,
-} from '@/data/admin-moderation';
+import { adminAvailabilityReports, filterAvailabilityReportsRows } from '@/data/admin-moderation';
+import type { AdminAvailabilityReport, AvailabilityFilter } from '@/data/admin-moderation';
 import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
+import { AdminLayout } from '@/templates/AdminLayout';
 
 const FILTER_TABS: { label: string; value: AvailabilityFilter }[] = [
   { label: 'Unresolved', value: 'unresolved' },
@@ -23,7 +19,7 @@ const LIMIT = 5;
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
-  const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
+  const diffMinutes = Math.max(0, Math.floor(diffMs / 60_000));
 
   if (diffMinutes < 60) {
     return `${Math.max(1, diffMinutes)}m`;
@@ -74,16 +70,16 @@ function AvailabilityReportsPanel() {
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = filteredReports.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const selectedReport = reports.find(function(report) {
+  const selectedReport = reports.find(function  selectedReport(report) {
     return report.id === selectedReportId;
   });
 
   const countCaption =
     activeFilter === 'unresolved'
       ? `${total} unresolved`
-      : activeFilter === 'resolved'
+      : (activeFilter === 'resolved'
         ? `${total} resolved`
-        : `${total} total`;
+        : `${total} total`);
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   function handleFilterChange(filter: AvailabilityFilter) {
@@ -106,8 +102,8 @@ function AvailabilityReportsPanel() {
 
     const trimmedNote = resolutionDraft.trim();
 
-    setReports(function(previousReports) {
-      return previousReports.map(function(report) {
+    setReports(function (previousReports) {
+      return previousReports.map(function (report) {
         if (report.id !== selectedReportId) {
           return report;
         }
@@ -128,7 +124,7 @@ function AvailabilityReportsPanel() {
   }
 
   function handleToggleExpanded(reportId: string) {
-    setExpandedReportId(function(previousId) {
+    setExpandedReportId(function (previousId) {
       return previousId === reportId ? null : reportId;
     });
   }
@@ -146,13 +142,13 @@ function AvailabilityReportsPanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {FILTER_TABS.map(function (tab) {
             return (
               <button
                 key={tab.value}
                 suppressHydrationWarning
                 className={`chip${activeFilter === tab.value ? ' active' : ''}`}
-                onClick={function() {
+                onClick={function () {
                   handleFilterChange(tab.value);
                 }}
                 type="button"
@@ -168,10 +164,10 @@ function AvailabilityReportsPanel() {
         <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[16px]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex flex-col gap-1">
-              <div className="font-[family:var(--font-display)] text-[15px] font-semibold text-[color:var(--text-primary)]">
+              <div className="text-[15px] font-[family:var(--font-display)] font-semibold text-[color:var(--text-primary)]">
                 Resolve {selectedReport.title}
               </div>
-              <div className="font-[family:var(--font-mono)] text-[11px] tracking-[0.3px] text-[color:var(--text-faint)]">
+              <div className="text-[11px] font-[family:var(--font-mono)] tracking-[0.3px] text-[color:var(--text-faint)]">
                 Optional note for the resolution record
               </div>
             </div>
@@ -179,7 +175,7 @@ function AvailabilityReportsPanel() {
             <div className="flex gap-2">
               <button
                 className="btn-ghost"
-                onClick={function() {
+                onClick={function () {
                   setSelectedReportId(null);
                   setResolutionDraft('');
                 }}
@@ -187,15 +183,20 @@ function AvailabilityReportsPanel() {
               >
                 Cancel
               </button>
-              <button suppressHydrationWarning className="btn-ghost" onClick={handleSaveResolve} type="button">
+              <button
+                suppressHydrationWarning
+                className="btn-ghost"
+                onClick={handleSaveResolve}
+                type="button"
+              >
                 Save
               </button>
             </div>
           </div>
 
           <textarea
-            className="mt-4 w-full rounded-[8px] border border-[color:var(--border)] bg-[color:var(--bg-deep)] px-3 py-3 font-[family:var(--font-body)] text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--accent-teal)]"
-            onChange={function(event) {
+            className="mt-4 w-full rounded-[8px] border border-[color:var(--border)] bg-[color:var(--bg-deep)] px-3 py-3 text-[13px] font-[family:var(--font-body)] text-[color:var(--text-primary)] transition outline-none focus:border-[color:var(--accent-teal)]"
+            onChange={function (event) {
               setResolutionDraft(event.target.value);
             }}
             placeholder="Add a short note, or leave this empty"
@@ -228,7 +229,7 @@ function AvailabilityReportsPanel() {
               </tr>
             </thead>
             <tbody>
-              {pageRows.map(function(report) {
+              {pageRows.map(function (report) {
                 const isExpanded = expandedReportId === report.id;
 
                 return (
@@ -258,7 +259,7 @@ function AvailabilityReportsPanel() {
                           <button
                             suppressHydrationWarning
                             className="btn-ghost"
-                            onClick={function() {
+                            onClick={function () {
                               handleToggleExpanded(report.id);
                             }}
                             type="button"
@@ -269,7 +270,7 @@ function AvailabilityReportsPanel() {
                           <button
                             suppressHydrationWarning
                             className="btn-ghost"
-                            onClick={function() {
+                            onClick={function () {
                               handleOpenResolve(report);
                             }}
                             type="button"
@@ -285,7 +286,12 @@ function AvailabilityReportsPanel() {
             </tbody>
           </table>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination
+            page={safePage}
+            totalPages={totalPages}
+            limit={LIMIT}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

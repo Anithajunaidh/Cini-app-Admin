@@ -3,15 +3,12 @@ import axios from 'axios';
 import { normalizeApiError } from './errors';
 import type { ApiErrorResponse } from './errors';
 
-
-
 async function refreshAccessToken() {
   // Better Auth handles refresh via /api/auth/get-session or token endpoint.
   // If the session cookie is still valid, hitting sign-in again would re-issue a token.
   // For now we throw to let the 401 handler fall through to handleLogout().
   throw new Error('Token refresh not yet implemented — user must sign in again.');
 }
-
 
 function handleLogout() {
   if (typeof window !== 'undefined') {
@@ -33,9 +30,7 @@ export const apiClient = axios.create({
 
 // ---- REQUEST INTERCEPTOR ----
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    return config;
-  },
+  (config: InternalAxiosRequestConfig) => config,
   // eslint-disable-next-line promise/prefer-await-to-callbacks
   (error) => {
     throw error;

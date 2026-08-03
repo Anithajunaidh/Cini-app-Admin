@@ -1,8 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useLogin } from '@/features/auth/api';
 import type { ApiError } from '@/lib/api/errors';
-import { useState } from 'react';
 
 /**
  * Sign-in page — calls POST /auth/login, stores the token, and
@@ -95,7 +95,7 @@ export default function SignInPage() {
               required
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>{  setEmail(e.target.value); }}
               placeholder="admin@example.com"
               style={{
                 background: 'var(--surface-raised)',
@@ -137,7 +137,7 @@ export default function SignInPage() {
               required
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>{  setPassword(e.target.value); }}
               placeholder="••••••••"
               style={{
                 background: 'var(--surface-raised)',

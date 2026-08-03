@@ -5,7 +5,15 @@ import path from 'node:path';
 import process from 'node:process';
 
 const rootDir = process.cwd();
-const pgliteServerBin = path.join(rootDir, 'node_modules', '@electric-sql', 'pglite-socket', 'dist', 'scripts', 'server.js');
+const pgliteServerBin = path.join(
+  rootDir,
+  'node_modules',
+  '@electric-sql',
+  'pglite-socket',
+  'dist',
+  'scripts',
+  'server.js',
+);
 const drizzleBin = path.join(rootDir, 'node_modules', 'drizzle-kit', 'bin.cjs');
 const nextBin = path.join(rootDir, 'node_modules', 'next', 'dist', 'bin', 'next');
 
@@ -15,7 +23,7 @@ function readEnvFile(filePath) {
   }
 
   const parsed = {};
-  const contents = fs.readFileSync(filePath, 'utf8');
+  const contents = fs.readFileSync(filePath, 'utf-8');
 
   for (const line of contents.split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -69,7 +77,7 @@ function startProcess(command, args, extraEnv = {}) {
   return child;
 }
 
-function waitForExit(child, label) {
+ async function waitForExit(child, label) {
   return new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('exit', (code, signal) => {
@@ -83,12 +91,12 @@ function waitForExit(child, label) {
         return;
       }
 
-      resolve(undefined);
+      resolve();
     });
   });
 }
 
-function waitForPort(host, port, timeoutMs = 15000) {
+ async function waitForPort(host, port, timeoutMs = 15_000) {
   const startedAt = Date.now();
 
   return new Promise((resolve, reject) => {
@@ -97,7 +105,7 @@ function waitForPort(host, port, timeoutMs = 15000) {
 
       socket.once('connect', () => {
         socket.end();
-        resolve(undefined);
+        resolve();
       });
 
       socket.once('error', () => {
@@ -119,7 +127,9 @@ function waitForPort(host, port, timeoutMs = 15000) {
 async function main() {
   const dbServer = startProcess(process.execPath, [pgliteServerBin, '-m', '100']);
 
-  const databaseUrl = new URL(env.DATABASE_URL ?? 'postgresql://postgres:postgres@127.0.0.1:5432/postgres');
+  const databaseUrl = new URL(
+    env.DATABASE_URL ?? 'postgresql://postgres:postgres@127.0.0.1:5432/postgres',
+  );
   await waitForPort(databaseUrl.hostname, Number(databaseUrl.port || 5432));
 
   const migrate = spawn(process.execPath, [drizzleBin, 'migrate'], {
@@ -142,10 +152,7 @@ async function main() {
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  await Promise.race([
-    waitForExit(dbServer, 'pglite-server'),
-    waitForExit(nextDev, 'next dev'),
-  ]);
+  await Promise.race([waitForExit(dbServer, 'pglite-server'), waitForExit(nextDev, 'next dev')]);
 
   shutdown();
 }

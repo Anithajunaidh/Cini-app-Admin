@@ -30,7 +30,9 @@ const PROTECTED_SEGMENTS = ['/dashboard', '/platforms', '/sync', '/users', '/com
 function isProtectedPath(pathname: string): boolean {
   // Strip locale prefix: /en/dashboard → /dashboard
   const withoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '') || '/';
-  return PROTECTED_SEGMENTS.some((seg) => withoutLocale === seg || withoutLocale.startsWith(`${seg}/`));
+  return PROTECTED_SEGMENTS.some(
+    (seg) => withoutLocale === seg || withoutLocale.startsWith(`${seg}/`),
+  );
 }
 
 export default async function proxy(request: NextRequest) {

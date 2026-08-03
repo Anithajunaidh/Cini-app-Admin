@@ -4,18 +4,16 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { LoginDto } from './types';
 
-
-
 /** Stores the access token in both localStorage (for apiClient) and a cookie (for middleware). */
 function storeToken(token: string) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {return;}
   localStorage.setItem('access_token', token);
   document.cookie = `access_token=${token}; path=/; SameSite=Lax`;
 }
 
 /** Clears all stored auth tokens from localStorage and cookies. */
 export function clearTokens() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {return;}
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
   document.cookie = 'access_token=; path=/; max-age=0';
@@ -44,7 +42,7 @@ export function useLogin() {
         let message = 'Invalid email or password.';
         try {
           const body = (await res.json()) as { message?: string };
-          if (body.message) message = body.message;
+          if (body.message) ({ message } = body);
         } catch {
           // ignore parse errors
         }
@@ -63,4 +61,3 @@ export function useLogin() {
     },
   });
 }
-

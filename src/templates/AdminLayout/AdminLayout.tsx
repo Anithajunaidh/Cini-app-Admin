@@ -117,11 +117,11 @@ function AdminLayoutShell(props: AdminLayoutProps) {
 export function AdminLayout(props: AdminLayoutProps) {
   return (
     <Suspense
-      fallback={(
+      fallback={
         <AdminSearchFallbackProvider>
           <AdminLayoutShell {...props} />
         </AdminSearchFallbackProvider>
-      )}
+      }
     >
       <AdminSearchProvider>
         <AdminLayoutShell {...props} />
