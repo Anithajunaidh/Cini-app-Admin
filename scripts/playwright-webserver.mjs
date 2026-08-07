@@ -77,8 +77,8 @@ function startProcess(command, args, extraEnv = {}) {
   return child;
 }
 
- async function waitForExit(child, label) {
-  return new Promise((resolve, reject) => {
+async function waitForExit(child, label) {
+  return await new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('exit', (code, signal) => {
       if (signal) {
@@ -96,10 +96,10 @@ function startProcess(command, args, extraEnv = {}) {
   });
 }
 
- async function waitForPort(host, port, timeoutMs = 15_000) {
+async function waitForPort(host, port, timeoutMs = 15_000) {
   const startedAt = Date.now();
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     function tryConnect() {
       const socket = net.connect({ host, port });
 

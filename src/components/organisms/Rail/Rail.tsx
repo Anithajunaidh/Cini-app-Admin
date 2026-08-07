@@ -1,8 +1,11 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Link } from '@/libs/I18nNavigation';
+import { Link, useRouter } from '@/libs/I18nNavigation';
+import { apiClient } from '@/lib/api/client';
+import { ENDPOINTS } from '@/lib/api/endpoints';
 
 type NavItem = {
   label: string;
@@ -165,6 +168,18 @@ type RailProps = {
 
 export function Rail(props: RailProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await apiClient.post(ENDPOINTS.auth.logout);
+    } catch (e) {
+      console.error('Sign out error', e);
+    } finally {
+      router.push('/sign-in');
+    }
+  };
 
   function isActive(href: string) {
     return pathname.includes(href);
@@ -217,13 +232,27 @@ export function Rail(props: RailProps) {
           )}
         </nav>
 
-        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px]">
-          <div
-            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)]"
+        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px] relative">
+          <button
+            type="button"
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)] hover:border-[var(--accent-teal)] transition-colors"
             title={props.adminName ?? 'Admin'}
           >
             {adminInitials}
-          </div>
+          </button>
+          
+          {isProfileMenuOpen && (
+            <div className="fixed bottom-[22px] left-[70px] z-[100] w-[140px] rounded-lg border border-[var(--border-soft)] bg-[var(--surface)] p-1 shadow-xl">
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="w-full rounded-[6px] px-3 py-2 text-left text-[13px] font-medium text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[#E5646A]"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     );
@@ -282,9 +311,13 @@ export function Rail(props: RailProps) {
         ))}
       </nav>
 
-      <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px]">
-        <div className="flex items-center gap-[9px]">
-          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)]">
+      <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px] relative">
+        <button
+          type="button"
+          onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          className="group flex w-full items-center gap-[9px] rounded-lg p-1 -mx-1 text-left transition-colors hover:bg-[var(--surface-hover)]"
+        >
+          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)] group-hover:border-[var(--accent-teal)]">
             {adminInitials}
           </div>
           <div className="min-w-0">
@@ -293,7 +326,19 @@ export function Rail(props: RailProps) {
               {props.adminRole ?? 'Role.Admin'}
             </div>
           </div>
-        </div>
+        </button>
+
+        {isProfileMenuOpen && (
+          <div className="absolute bottom-full left-0 z-[100] mb-2 w-full rounded-lg border border-[var(--border-soft)] bg-[var(--surface)] p-1 shadow-lg">
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-full rounded-[6px] px-3 py-2 text-left text-[13px] font-medium text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[#E5646A]"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

@@ -3,7 +3,7 @@ type PaginationProps = {
   totalPages: number;
   limit?: number;
   onPageChange: (newPage: number) => void;
-}
+};
 
 export function Pagination({ page, totalPages, limit, onPageChange }: PaginationProps) {
   return (

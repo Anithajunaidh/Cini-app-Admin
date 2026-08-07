@@ -4,8 +4,14 @@ import { useState } from 'react';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
-import { AdminLayout } from '@/components/templates/AdminLayout';
-import { ADMIN_USER_ROLES, CURRENT_ADMIN_ID, adminUsers, filterAdminUsers, getRoleBadgeVariant } from '@/data/admin-users';
+import { AdminLayout } from '@/templates/AdminLayout';
+import {
+  ADMIN_USER_ROLES,
+  CURRENT_ADMIN_ID,
+  adminUsers,
+  filterAdminUsers,
+  getRoleBadgeVariant,
+} from '@/data/admin-users';
 import type { AdminUser, AdminUserRole, UsersFilter } from '@/data/admin-users';
 import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
 
@@ -37,7 +43,7 @@ function UsersPanel() {
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = filteredUsers.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const roleEditorUser = users.find(function  roleEditorUser(user) {
+  const roleEditorUser = users.find(function roleEditorUser(user) {
     return user.id === roleEditorUserId;
   });
 

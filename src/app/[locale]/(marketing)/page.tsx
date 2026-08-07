@@ -8,5 +8,5 @@ type IndexPageProps = {
 export default async function Index(props: IndexPageProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
-  redirect('/dashboard');
+  redirect('/sign-in');
 }

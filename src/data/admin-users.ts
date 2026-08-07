@@ -12,7 +12,7 @@ export type AdminUser = {
   role: AdminUserRole;
   suspended: boolean;
   joinedAt: string;
-}
+};
 
 /** Logged-in admin id used for own-row safeguards on the Users page. */
 export const CURRENT_ADMIN_ID = 'u_0001';

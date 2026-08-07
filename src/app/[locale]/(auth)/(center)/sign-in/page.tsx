@@ -1,6 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { SignInForm } from '@/components/auth/SignInForm';
-
+import SignInPage from '@/pages/SignIn';
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
   const { locale } = await props.params;
   const t = await getTranslations({
@@ -14,9 +13,9 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   };
 }
 
-export default async function SignInPage(props: { params: Promise<{ locale: string }> }) {
+export default async function SignInRoute(props: { params: Promise<{ locale: string }> }) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return <SignInForm />;
+  return <SignInPage />;
 }

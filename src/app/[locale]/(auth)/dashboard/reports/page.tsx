@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
-import { AdminLayout } from '@/components/templates/AdminLayout';
+import { AdminLayout } from '@/templates/AdminLayout';
 import { adminAvailabilityReports, filterAvailabilityReportsRows } from '@/data/admin-moderation';
 import type { AdminAvailabilityReport, AvailabilityFilter } from '@/data/admin-moderation';
 import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
@@ -70,7 +70,7 @@ function AvailabilityReportsPanel() {
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = filteredReports.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const selectedReport = reports.find(function  selectedReport(report) {
+  const selectedReport = reports.find(function selectedReport(report) {
     return report.id === selectedReportId;
   });
 

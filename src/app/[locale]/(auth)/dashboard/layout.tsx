@@ -13,9 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { AdminProtectedRoute } from '@/components/auth/AdminProtectedRoute';
+
 export default async function DashboardLayout(props: DashboardLayoutProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return <>{props.children}</>;
+  return <AdminProtectedRoute>{props.children}</AdminProtectedRoute>;
 }

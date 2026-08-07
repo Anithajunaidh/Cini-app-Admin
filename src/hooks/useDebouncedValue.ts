@@ -12,7 +12,7 @@ export function useDebouncedValue<T>(value: T, delayMs = 250) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(function  timeoutId() {
+    const timeoutId = window.setTimeout(function timeoutId() {
       setDebouncedValue(value);
     }, delayMs);
 
