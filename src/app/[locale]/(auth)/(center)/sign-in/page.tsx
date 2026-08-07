@@ -17,7 +17,7 @@ export default function SignInPage() {
 
     try {
       // Better-Auth is mounted at /api/auth in the backend
-      const authUrl = 'http://localhost:4000/api/auth/sign-in/email';
+      const authUrl = 'https://cineapp-backend.innogenio.com/api/auth/sign-in/email';
       
       const response = await fetch(authUrl, {
         method: 'POST',

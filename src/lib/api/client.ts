@@ -23,7 +23,7 @@ function handleLogout() {
 
 // eslint-disable-next-line import/no-named-as-default-member
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://cineapp-backend.innogenio.com/api/v1',
   timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',

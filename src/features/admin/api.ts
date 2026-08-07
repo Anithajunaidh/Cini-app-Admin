@@ -103,6 +103,8 @@ function buildCommentQueryParams(params: AdminCommentsQueryParams) {
     status: params.status,
   };
 
+  if (params.query) query.query = params.query;
+
   return query;
 }
 
@@ -249,10 +251,17 @@ export function useAdminAvailabilityReports(params: AdminAvailabilityReportsQuer
   return useQuery({
     queryKey: queryKeys.admin.availabilityReports.list(params),
     queryFn: async () => {
+      const apiParams: Record<string, string | number | boolean> = {
+        page: params.page,
+        limit: params.limit,
+        resolved: params.resolved,
+      };
+      if (params.query) apiParams.query = params.query;
+
       const data = (await apiClient.get(
         ENDPOINTS.admin.availabilityReports,
         {
-          params,
+          params: apiParams,
         },
       )) as PaginatedDto<AvailabilityReportDto>;
 
@@ -309,8 +318,15 @@ export function useAdminUsers(params: AdminUsersQueryParams) {
   return useQuery({
     queryKey: queryKeys.admin.users.list(params),
     queryFn: async () => {
+      const apiParams: Record<string, string | number | boolean> = {
+        page: params.page,
+        limit: params.limit,
+        suspended: params.suspended,
+      };
+      if (params.query) apiParams.query = params.query;
+
       const data = (await apiClient.get(ENDPOINTS.admin.users, {
-        params,
+        params: apiParams,
       })) as PaginatedUsersDto;
 
       const normalizedRows = data.data.map(normalizeUserRow);
