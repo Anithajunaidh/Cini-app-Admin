@@ -1,9 +1,13 @@
 /** All API endpoint paths. Group by resource/domain. */
 export const ENDPOINTS = {
   auth: {
-    login: '/auth/login',
+    login: '/api/auth/sign-in/email',
     refresh: '/auth/refresh',
-    logout: '/auth/logout',
+    logout: '/api/auth/sign-out',
+    getSession: '/api/auth/get-session',
+  },
+  users: {
+    me: '/api/v1/users/me',
   },
   testUsers: {
     list: '/users',

@@ -10,22 +10,30 @@ import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
 // Helpers — mirrored from SyncPulseStrip so both stay in sync
 
 function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
-  if (!isoString) {return 'amber';}
+  if (!isoString) {
+    return 'amber';
+  }
   const ageMs = Date.now() - new Date(isoString).getTime();
   return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
-  if (epochSeconds == null) {return 'amber';}
+  if (epochSeconds == null) {
+    return 'amber';
+  }
   const ageMs = Date.now() - epochSeconds * 1000;
   return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
 }
 
 function formatRelative(ms: number): string {
   const min = Math.floor(ms / 60_000);
-  if (min < 60) {return `${min}m ago`;}
+  if (min < 60) {
+    return `${min}m ago`;
+  }
   const hr = Math.floor(min / 60);
-  if (hr < 24) {return `${hr}h ago`;}
+  if (hr < 24) {
+    return `${hr}h ago`;
+  }
   return `${Math.floor(hr / 24)}d ago`;
 }
 

@@ -4,17 +4,15 @@ import { useState } from 'react';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
-import { AdminLayout } from '@/components/templates/AdminLayout';
+import { AdminLayout } from '@/templates/AdminLayout';
 import {
   ADMIN_USER_ROLES,
   CURRENT_ADMIN_ID,
   adminUsers,
   filterAdminUsers,
   getRoleBadgeVariant,
-  type AdminUser,
-  type AdminUserRole,
-  type UsersFilter,
 } from '@/data/admin-users';
+import type { AdminUser, AdminUserRole, UsersFilter } from '@/data/admin-users';
 import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
 
 const FILTER_TABS: { label: string; value: UsersFilter }[] = [
@@ -45,7 +43,7 @@ function UsersPanel() {
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = filteredUsers.slice((safePage - 1) * LIMIT, safePage * LIMIT);
-  const roleEditorUser = users.find(function(user) {
+  const roleEditorUser = users.find(function roleEditorUser(user) {
     return user.id === roleEditorUserId;
   });
 
@@ -78,8 +76,8 @@ function UsersPanel() {
       return;
     }
 
-    setUsers(function(previousUsers) {
-      return previousUsers.map(function(user) {
+    setUsers(function (previousUsers) {
+      return previousUsers.map(function (user) {
         if (user.id !== userId) {
           return user;
         }
@@ -101,8 +99,8 @@ function UsersPanel() {
       return;
     }
 
-    setUsers(function(previousUsers) {
-      return previousUsers.map(function(user) {
+    setUsers(function (previousUsers) {
+      return previousUsers.map(function (user) {
         if (user.id !== userId) {
           return user;
         }
@@ -126,13 +124,13 @@ function UsersPanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {FILTER_TABS.map(function (tab) {
             return (
               <button
                 key={tab.value}
                 suppressHydrationWarning
                 className={`chip${activeFilter === tab.value ? ' active' : ''}`}
-                onClick={function() {
+                onClick={function () {
                   handleFilterChange(tab.value);
                 }}
                 type="button"
@@ -145,7 +143,7 @@ function UsersPanel() {
       </div>
 
       {actionError ? (
-        <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[12px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--accent-red)]">
+        <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[12px] text-[12px] font-[family:var(--font-mono)] text-[color:var(--accent-red)]">
           {actionError}
         </div>
       ) : null}
@@ -154,23 +152,23 @@ function UsersPanel() {
         <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[16px]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex flex-col gap-1">
-              <div className="font-[family:var(--font-display)] text-[15px] font-semibold text-[color:var(--text-primary)]">
+              <div className="text-[15px] font-[family:var(--font-display)] font-semibold text-[color:var(--text-primary)]">
                 Change role for {roleEditorUser.name}
               </div>
-              <div className="font-[family:var(--font-mono)] text-[11px] tracking-[0.3px] text-[color:var(--text-faint)]">
+              <div className="text-[11px] font-[family:var(--font-mono)] tracking-[0.3px] text-[color:var(--text-faint)]">
                 Current role: {roleEditorUser.role}
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {ADMIN_USER_ROLES.map(function(role) {
+              {ADMIN_USER_ROLES.map(function (role) {
                 return (
                   <button
                     key={role}
                     suppressHydrationWarning
                     className="btn-ghost"
                     disabled={role === roleEditorUser.role}
-                    onClick={function() {
+                    onClick={function () {
                       handleChangeRole(roleEditorUser.id, role);
                     }}
                     type="button"
@@ -181,7 +179,7 @@ function UsersPanel() {
               })}
               <button
                 className="btn-ghost"
-                onClick={function() {
+                onClick={function () {
                   setRoleEditorUserId(null);
                 }}
                 type="button"
@@ -215,7 +213,7 @@ function UsersPanel() {
               </tr>
             </thead>
             <tbody>
-              {pageRows.map(function(user) {
+              {pageRows.map(function (user) {
                 const isOwnRow = user.id === CURRENT_ADMIN_ID;
 
                 return (
@@ -255,7 +253,7 @@ function UsersPanel() {
                             <button
                               suppressHydrationWarning
                               className="btn-ghost"
-                              onClick={function() {
+                              onClick={function () {
                                 handleOpenRoleEditor(user);
                               }}
                               type="button"
@@ -265,7 +263,7 @@ function UsersPanel() {
                             <button
                               suppressHydrationWarning
                               className={`btn-ghost${user.suspended ? '' : ' danger'}`}
-                              onClick={function() {
+                              onClick={function () {
                                 handleToggleSuspended(user.id);
                               }}
                               type="button"
@@ -282,7 +280,12 @@ function UsersPanel() {
             </tbody>
           </table>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination
+            page={safePage}
+            totalPages={totalPages}
+            limit={LIMIT}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

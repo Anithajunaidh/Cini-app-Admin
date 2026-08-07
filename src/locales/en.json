@@ -57,5 +57,21 @@
   },
   "LocaleSwitcher": {
     "change_language": "Change language"
+  },
+  "SignIn": {
+    "meta_title": "Sign In",
+    "meta_description": "Sign in to the MIRALO BACKOFFICE",
+    "title": "Sign in to your account",
+    "subtitle": "Enter your credentials below",
+    "email_label": "Email",
+    "password_label": "Password",
+    "submit_button": "Sign In",
+    "email_placeholder": "admin@example.com",
+    "password_placeholder": "••••••••",
+    "email_required": "Email is required",
+    "password_required": "Password is required",
+    "invalid_email": "Invalid email address",
+    "invalid_credentials": "The email or password you entered is incorrect.",
+    "general_error": "An error occurred during sign in. Please try again."
   }
 }

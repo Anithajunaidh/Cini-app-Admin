@@ -1,9 +1,9 @@
-interface PaginationProps {
+type PaginationProps = {
   page: number;
   totalPages: number;
   limit?: number;
   onPageChange: (newPage: number) => void;
-}
+};
 
 export function Pagination({ page, totalPages, limit, onPageChange }: PaginationProps) {
   return (
@@ -15,7 +15,7 @@ export function Pagination({ page, totalPages, limit, onPageChange }: Pagination
       <span className="pager">
         <button
           suppressHydrationWarning
-          onClick={function() {
+          onClick={function () {
             onPageChange(page - 1);
           }}
           disabled={page <= 1}
@@ -25,7 +25,7 @@ export function Pagination({ page, totalPages, limit, onPageChange }: Pagination
         </button>
         <button
           suppressHydrationWarning
-          onClick={function() {
+          onClick={function () {
             onPageChange(page + 1);
           }}
           disabled={page >= totalPages}

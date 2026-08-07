@@ -1,8 +1,11 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { Link } from '@/libs/I18nNavigation';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { Link, useRouter } from '@/libs/I18nNavigation';
+import { apiClient } from '@/lib/api/client';
+import { ENDPOINTS } from '@/lib/api/endpoints';
 
 type NavItem = {
   label: string;
@@ -165,6 +168,18 @@ type RailProps = {
 
 export function Rail(props: RailProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await apiClient.post(ENDPOINTS.auth.logout);
+    } catch (e) {
+      console.error('Sign out error', e);
+    } finally {
+      router.push('/sign-in');
+    }
+  };
 
   function isActive(href: string) {
     return pathname.includes(href);
@@ -207,7 +222,7 @@ export function Rail(props: RailProps) {
                 >
                   <span className="shrink-0 opacity-90 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
                   {badge !== undefined ? (
-                    <span className="absolute -right-[3px] -top-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
+                    <span className="absolute -top-[3px] -right-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
                       {badge > 9 ? '9+' : badge}
                     </span>
                   ) : null}
@@ -217,13 +232,27 @@ export function Rail(props: RailProps) {
           )}
         </nav>
 
-        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px]">
-          <div
-            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)]"
+        <div className="mt-auto border-t border-[var(--border-soft)] pt-[14px] relative">
+          <button
+            type="button"
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[12px] text-[var(--text-muted)] hover:border-[var(--accent-teal)] transition-colors"
             title={props.adminName ?? 'Admin'}
           >
             {adminInitials}
-          </div>
+          </button>
+          
+          {isProfileMenuOpen && (
+            <div className="fixed bottom-[22px] left-[70px] z-[100] w-[140px] rounded-lg border border-[var(--border-soft)] bg-[var(--surface)] p-1 shadow-xl">
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="w-full rounded-[6px] px-3 py-2 text-left text-[13px] font-medium text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[#E5646A]"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     );
@@ -239,7 +268,7 @@ export function Rail(props: RailProps) {
           <div className="font-[family-name:var(--font-display)] text-[15px] font-semibold tracking-[0.2px]">
             MIRALO
           </div>
-          <div className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.6px] text-[var(--text-faint)]">
+          <div className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.6px] text-[var(--text-faint)] uppercase">
             Backoffice
           </div>
         </div>
@@ -248,7 +277,7 @@ export function Rail(props: RailProps) {
       <nav className="flex flex-col gap-[2px]" aria-label="Main navigation">
         {navGroups.map((group) => (
           <div key={group.eyebrow}>
-            <div className="px-[10px] pb-[6px] pt-[14px] font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[1.2px] text-[var(--text-faint)]">
+            <div className="px-[10px] pt-[14px] pb-[6px] font-[family-name:var(--font-mono)] text-[10px] tracking-[1.2px] text-[var(--text-faint)] uppercase">
               {group.eyebrow}
             </div>
             {group.items.map((item) => {
@@ -282,9 +311,13 @@ export function Rail(props: RailProps) {
         ))}
       </nav>
 
-      <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px]">
-        <div className="flex items-center gap-[9px]">
-          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)]">
+      <div className="mt-auto border-t border-[var(--border-soft)] px-2 pt-[14px] relative">
+        <button
+          type="button"
+          onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          className="group flex w-full items-center gap-[9px] rounded-lg p-1 -mx-1 text-left transition-colors hover:bg-[var(--surface-hover)]"
+        >
+          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-muted)] group-hover:border-[var(--accent-teal)]">
             {adminInitials}
           </div>
           <div className="min-w-0">
@@ -293,7 +326,19 @@ export function Rail(props: RailProps) {
               {props.adminRole ?? 'Role.Admin'}
             </div>
           </div>
-        </div>
+        </button>
+
+        {isProfileMenuOpen && (
+          <div className="absolute bottom-full left-0 z-[100] mb-2 w-full rounded-lg border border-[var(--border-soft)] bg-[var(--surface)] p-1 shadow-lg">
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-full rounded-[6px] px-3 py-2 text-left text-[13px] font-medium text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[#E5646A]"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

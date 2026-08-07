@@ -7,6 +7,6 @@ import type { TestUser } from './types';
 export function useTestUsers() {
   return useQuery({
     queryKey: queryKeys.testUsers.list(),
-    queryFn:  async () => apiClient.get<never, TestUser[]>(ENDPOINTS.testUsers.list),
+    queryFn: async () => await apiClient.get<never, TestUser[]>(ENDPOINTS.testUsers.list),
   });
 }
