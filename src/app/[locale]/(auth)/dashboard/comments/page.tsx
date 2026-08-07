@@ -9,15 +9,7 @@ import { AdminLayout } from '@/components/templates/AdminLayout';
 import { useAdminComments, useSetCommentHidden } from '@/features/admin/api';
 import { useAdminDebouncedSearchQuery } from '@/hooks/useAdminSearch';
 
-const FILTER_TABS: { label: string; value: CommentFilter }[] = [
-  { label: 'Reported', value: 'reported' },
-  { label: 'Hidden', value: 'hidden' },
-  { label: 'All', value: 'all' },
-];
-
-const LIMIT = 5;
-
-type CommentFilter = 'reported' | 'hidden' | 'all';
+import { COMMENT_FILTER_TABS, COMMENTS_PAGE_LIMIT, type CommentFilter } from '@/constants/admin.constants';
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
@@ -61,14 +53,14 @@ function CommentQueuePanel() {
   const searchQuery = useAdminDebouncedSearchQuery();
   const commentsQuery = useAdminComments({
     page,
-    limit: LIMIT,
+    limit: COMMENTS_PAGE_LIMIT,
     status: activeFilter,
     query: searchQuery,
   });
   const setCommentHidden = useSetCommentHidden();
 
   const total = commentsQuery.data?.meta.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const totalPages = Math.max(1, Math.ceil(total / COMMENTS_PAGE_LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = commentsQuery.data?.data ?? [];
 
@@ -137,7 +129,7 @@ function CommentQueuePanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {COMMENT_FILTER_TABS.map(function(tab) {
             return (
               <button
                 key={tab.value}
@@ -172,8 +164,9 @@ function CommentQueuePanel() {
         />
       ) : (
         <>
-          <table>
-            <thead>
+          <div className="overflow-x-auto w-full">
+            <table>
+              <thead>
               <tr>
                 <th>Comment</th>
                 <th>Author</th>
@@ -222,9 +215,10 @@ function CommentQueuePanel() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination page={safePage} totalPages={totalPages} limit={COMMENTS_PAGE_LIMIT} onPageChange={setPage} />
         </>
       )}
     </div>

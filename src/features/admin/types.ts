@@ -5,6 +5,7 @@ export type AdminStatsDto = {
   totalTitles: number;
   totalRatings: number;
   pendingReports: number;
+  pendingComments: number;
 };
 
 /** Source type for needs-attention items */

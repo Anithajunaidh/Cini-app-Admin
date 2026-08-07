@@ -12,15 +12,7 @@ import {
 } from '@/features/admin/api';
 import { useAdminDebouncedSearchQuery } from '@/hooks/useAdminSearch';
 
-const FILTER_TABS: { label: string; value: AvailabilityFilter }[] = [
-  { label: 'Unresolved', value: 'unresolved' },
-  { label: 'Resolved', value: 'resolved' },
-  { label: 'All', value: 'all' },
-];
-
-const LIMIT = 5;
-
-type AvailabilityFilter = 'unresolved' | 'resolved' | 'all';
+import { REPORT_FILTER_TABS, REPORTS_PAGE_LIMIT, type AvailabilityFilter } from '@/constants/admin.constants';
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
@@ -79,7 +71,7 @@ function AvailabilityReportsPanel() {
   const searchQuery = useAdminDebouncedSearchQuery();
   const reportsQuery = useAdminAvailabilityReports({
     page,
-    limit: LIMIT,
+    limit: REPORTS_PAGE_LIMIT,
     resolved:
       activeFilter === 'unresolved'
         ? 'false'
@@ -91,7 +83,7 @@ function AvailabilityReportsPanel() {
   const resolveReport = useResolveAvailabilityReport();
 
   const total = reportsQuery.data?.meta.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const totalPages = Math.max(1, Math.ceil(total / REPORTS_PAGE_LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = reportsQuery.data?.data ?? [];
   const selectedReport = pageRows.find(function(report) {
@@ -198,7 +190,7 @@ function AvailabilityReportsPanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {REPORT_FILTER_TABS.map(function(tab) {
             return (
               <button
                 key={tab.value}
@@ -280,8 +272,9 @@ function AvailabilityReportsPanel() {
         />
       ) : (
         <>
-          <table>
-            <thead>
+          <div className="overflow-x-auto w-full">
+            <table>
+              <thead>
               <tr>
                 <th>Title</th>
                 <th>Platform</th>
@@ -347,9 +340,10 @@ function AvailabilityReportsPanel() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination page={safePage} totalPages={totalPages} limit={REPORTS_PAGE_LIMIT} onPageChange={setPage} />
         </>
       )}
     </div>

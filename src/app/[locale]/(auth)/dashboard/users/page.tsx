@@ -20,12 +20,7 @@ import {
   type UsersFilter,
 } from '@/data/admin-users';
 
-const FILTER_TABS: { label: string; value: UsersFilter }[] = [
-  { label: 'All roles', value: 'all' },
-  { label: 'Suspended', value: 'suspended' },
-];
-
-const LIMIT = 5;
+import { USER_FILTER_TABS, USERS_PAGE_LIMIT } from '@/constants/admin.constants';
 
 function formatJoinedDate(value: string) {
   return value.slice(0, 10);
@@ -51,7 +46,7 @@ function UsersPanel() {
   const searchQuery = useAdminDebouncedSearchQuery();
   const usersQuery = useAdminUsers({
     page,
-    limit: LIMIT,
+    limit: USERS_PAGE_LIMIT,
     suspended: activeFilter === 'suspended' ? 'true' : 'all',
     query: searchQuery,
   });
@@ -59,7 +54,7 @@ function UsersPanel() {
   const suspendUser = useSuspendAdminUser();
 
   const total = usersQuery.data?.meta.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const totalPages = Math.max(1, Math.ceil(total / USERS_PAGE_LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
   const pageRows = usersQuery.data?.data ?? [];
   const roleEditorUser = pageRows.find(function(user) {
@@ -121,8 +116,8 @@ function UsersPanel() {
     );
   }
 
-  function handleSuspendUser(userId: string) {
-    if (userId === CURRENT_ADMIN_ID) {
+  function handleSuspendUser(user: { id: string; suspended: boolean }) {
+    if (user.id === CURRENT_ADMIN_ID) {
       setActionError('Cannot suspend your own account');
       return;
     }
@@ -130,7 +125,7 @@ function UsersPanel() {
     setActionError(null);
 
     suspendUser.mutate(
-      { id: userId },
+      { id: user.id, currentlySuspended: user.suspended },
       {
         onError(error) {
           setActionError(getUserErrorMessage(error));
@@ -160,7 +155,7 @@ function UsersPanel() {
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {USER_FILTER_TABS.map(function(tab) {
             return (
               <button
                 key={tab.value}
@@ -235,8 +230,9 @@ function UsersPanel() {
         <EmptyState title="No users found" subtitle="There are no users for this filter." />
       ) : (
         <>
-          <table>
-            <thead>
+          <div className="overflow-x-auto w-full">
+            <table>
+              <thead>
               <tr>
                 <th>User</th>
                 <th>Role</th>
@@ -299,7 +295,7 @@ function UsersPanel() {
                               className={`btn-ghost${user.suspended ? '' : ' danger'}`}
                               disabled={suspendUser.isPending}
                               onClick={function() {
-                                handleSuspendUser(user.id);
+                                handleSuspendUser(user);
                               }}
                               type="button"
                             >
@@ -313,9 +309,10 @@ function UsersPanel() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination page={safePage} totalPages={totalPages} limit={USERS_PAGE_LIMIT} onPageChange={setPage} />
         </>
       )}
     </div>

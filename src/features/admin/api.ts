@@ -3,8 +3,6 @@ import { apiClient } from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { queryKeys } from '@/lib/query/query-keys';
 import { matchSearchQuery } from '@/lib/search/matchSearchQuery';
-import adminUsersData from '@/data/admin-users.json';
-import mockData from './mockData.json';
 import type {
   AdminAvailabilityReportRow,
   AdminCommentRow,
@@ -63,17 +61,18 @@ type UpdateUserRoleMutation = {
 
 type SuspendUserMutation = {
   id: string;
+  currentlySuspended: boolean;
 };
 
-function normalizeCommentRow(comment: ReportedCommentDto): AdminCommentRow {
+function normalizeCommentRow(comment: any): AdminCommentRow {
   return {
     id: comment.id,
-    text: comment.text,
-    hidden: comment.isHidden,
+    text: comment.body ?? comment.text ?? '',
+    hidden: comment.hidden ?? comment.isHidden ?? false,
     userId: comment.userId,
-    username: comment.username,
+    username: comment.username ?? 'Unknown User',
     titleId: comment.titleId ?? null,
-    titleName: comment.titleName ?? null,
+    titleName: comment.titleName ?? 'Unknown Title',
     createdAt: comment.createdAt,
     reportedAt: comment.createdAt,
   };
@@ -104,10 +103,6 @@ function buildCommentQueryParams(params: AdminCommentsQueryParams) {
     status: params.status,
   };
 
-  if (params.status !== 'all') {
-    query.hidden = params.status === 'hidden';
-  }
-
   return query;
 }
 
@@ -127,45 +122,6 @@ function paginateRows<T>(rows: T[], page: number, limit: number) {
   };
 }
 
-function mergeRowsById<T extends { id: string }>(rows: T[], patchRows: T[]) {
-  const indexById = new Map(rows.map((row, index) => [row.id, index] as const));
-  const nextRows = rows.slice();
-
-  for (const patchRow of patchRows) {
-    const matchIndex = indexById.get(patchRow.id);
-
-    if (matchIndex === undefined) {
-      nextRows.push(patchRow);
-      continue;
-    }
-
-    nextRows[matchIndex] = patchRow;
-  }
-
-  return nextRows;
-}
-
-function normalizeMockCommentRow(comment: {
-  id: string;
-  text: string;
-  title: string;
-  authorId: string;
-  hidden: boolean;
-  createdAt: string;
-}): AdminCommentRow {
-  return {
-    id: comment.id,
-    text: comment.text,
-    hidden: comment.hidden,
-    userId: comment.authorId,
-    username: comment.authorId,
-    titleId: null,
-    titleName: comment.title,
-    createdAt: comment.createdAt,
-    reportedAt: comment.createdAt,
-  };
-}
-
 function normalizeUserRow(user: AdminUserDto): AdminUserRow {
   const joinedAt = user.joinedAt ?? user.createdAt ?? new Date().toISOString();
 
@@ -179,98 +135,6 @@ function normalizeUserRow(user: AdminUserDto): AdminUserRow {
   };
 }
 
-function normalizeMockAvailabilityReportRow(report: {
-  id: string;
-  titleName: string;
-  platform: string | null;
-  category: string;
-  reportedBy: string;
-  resolvedAt: string | null;
-  resolution: string | null;
-  createdAt: string;
-}): AdminAvailabilityReportRow {
-  return {
-    id: report.id,
-    title: report.titleName,
-    platform: report.platform,
-    category: report.category,
-    reportedBy: report.reportedBy,
-    reportedAt: report.createdAt,
-    resolved: report.resolvedAt !== null,
-    resolvedAt: report.resolvedAt,
-    resolution: report.resolution,
-  };
-}
-
-const localCommentRows: AdminCommentRow[] = mockData.comments.map(normalizeMockCommentRow);
-const localAvailabilityReportRows: AdminAvailabilityReportRow[] = mockData.reports.map(
-  normalizeMockAvailabilityReportRow,
-);
-const localUserRows: AdminUserRow[] = (adminUsersData as AdminUserDto[]).map(normalizeUserRow);
-
-function updateLocalCommentRow(commentId: string, nextHidden: boolean) {
-  const updated = localCommentRows.map(function(row) {
-    if (row.id !== commentId) {
-      return row;
-    }
-
-    return {
-      ...row,
-      hidden: nextHidden,
-    };
-  });
-
-  localCommentRows.splice(0, localCommentRows.length, ...updated);
-
-  return localCommentRows.find(function(row) {
-    return row.id === commentId;
-  });
-}
-
-function updateLocalAvailabilityReportRow(
-  reportId: string,
-  nextResolution: string | null,
-  nextResolvedAt: string | null,
-) {
-  const updated = localAvailabilityReportRows.map(function(row) {
-    if (row.id !== reportId) {
-      return row;
-    }
-
-    return {
-      ...row,
-      resolved: true,
-      resolution: nextResolution,
-      resolvedAt: nextResolvedAt,
-    };
-  });
-
-  localAvailabilityReportRows.splice(0, localAvailabilityReportRows.length, ...updated);
-
-  return localAvailabilityReportRows.find(function(row) {
-    return row.id === reportId;
-  });
-}
-
-function updateLocalUserRow(userId: string, patch: Partial<AdminUserRow>) {
-  const updated = localUserRows.map(function(row) {
-    if (row.id !== userId) {
-      return row;
-    }
-
-    return {
-      ...row,
-      ...patch,
-    };
-  });
-
-  localUserRows.splice(0, localUserRows.length, ...updated);
-
-  return localUserRows.find(function(row) {
-    return row.id === userId;
-  });
-}
-
 // =====================================================================
 // Stats
 // =====================================================================
@@ -279,7 +143,10 @@ function updateLocalUserRow(userId: string, patch: Partial<AdminUserRow>) {
 export function useAdminStats() {
   return useQuery({
     queryKey: queryKeys.admin.stats,
-    queryFn: async () => mockData.stats as AdminStatsDto,
+    queryFn: async () => {
+      const data = (await apiClient.get(ENDPOINTS.admin.stats)) as AdminStatsDto;
+      return data;
+    },
   });
 }
 
@@ -292,72 +159,31 @@ export function useAdminComments(params: AdminCommentsQueryParams) {
   return useQuery({
     queryKey: queryKeys.admin.comments.list(params),
     queryFn: async () => {
-      try {
-        const data = (await apiClient.get(ENDPOINTS.admin.comments, {
-          params: buildCommentQueryParams(params),
-        })) as PaginatedDto<ReportedCommentDto>;
+      const data = (await apiClient.get(ENDPOINTS.admin.comments, {
+        params: buildCommentQueryParams(params),
+      })) as PaginatedDto<ReportedCommentDto>;
 
-        const normalizedRows = data.data.map(normalizeCommentRow);
-        localCommentRows.splice(0, localCommentRows.length, ...mergeRowsById(localCommentRows, normalizedRows));
+      const normalizedRows = data.data.map(normalizeCommentRow);
+      const searchQuery = params.query?.trim() ?? '';
 
-        const searchQuery = params.query?.trim() ?? '';
+      if (searchQuery.length > 0) {
+        const filteredRows = normalizedRows.filter(function(comment) {
+          return matchSearchQuery(searchQuery, [
+            comment.text,
+            comment.id,
+            comment.userId,
+            comment.titleName,
+            comment.titleId,
+          ]);
+        });
 
-        if (searchQuery.length > 0) {
-          const filteredRows = localCommentRows.filter(function(comment) {
-            if (params.status === 'reported' && comment.hidden) {
-              return false;
-            }
-
-            if (params.status === 'hidden' && !comment.hidden) {
-              return false;
-            }
-
-            return matchSearchQuery(searchQuery, [
-              comment.text,
-              comment.id,
-              comment.userId,
-              comment.titleName,
-              comment.titleId,
-            ]);
-          });
-
-          return paginateRows(filteredRows, params.page, params.limit);
-        }
-
-        return {
-          data: normalizedRows,
-          meta: data.meta,
-        };
-      } catch {
-        const searchQuery = params.query?.trim() ?? '';
-        const fallbackRows = localCommentRows
-          .filter(function(comment) {
-            if (params.status === 'reported') {
-              return !comment.hidden;
-            }
-
-            if (params.status === 'hidden') {
-              return comment.hidden;
-            }
-
-            return true;
-          });
-
-        const searchedRows =
-          searchQuery.length > 0
-            ? fallbackRows.filter(function(comment) {
-                return matchSearchQuery(searchQuery, [
-                  comment.text,
-                  comment.id,
-                  comment.userId,
-                  comment.titleName,
-                  comment.titleId,
-                ]);
-              })
-            : fallbackRows;
-
-        return paginateRows(searchedRows, params.page, params.limit);
+        return paginateRows(filteredRows, params.page, params.limit);
       }
+
+      return {
+        data: normalizedRows,
+        meta: data.meta,
+      };
     },
   });
 }
@@ -368,22 +194,12 @@ export function useSetCommentHidden() {
 
   return useMutation({
     mutationFn: async ({ id, hidden }: CommentVisibilityMutation) => {
-      try {
-        const data = (await apiClient.patch(
-          `${ENDPOINTS.admin.comments}/${id}/hide`,
-          { hidden },
-        )) as ReportedCommentDto;
+      const endpoint = hidden ? 'hide' : 'unhide';
+      const data = (await apiClient.patch(
+        `${ENDPOINTS.admin.comments}/${id}/${endpoint}`,
+      )) as ReportedCommentDto;
 
-        const normalized = normalizeCommentRow(data);
-        updateLocalCommentRow(id, normalized.hidden);
-        return normalized;
-      } catch {
-        const updated = updateLocalCommentRow(id, hidden);
-        if (!updated) {
-          throw new Error('Comment not found in local cache.');
-        }
-        return updated;
-      }
+      return normalizeCommentRow(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.comments.all });
@@ -399,7 +215,10 @@ export function useSetCommentHidden() {
 export function useAdminSyncStatus() {
   return useQuery({
     queryKey: queryKeys.admin.syncStatus,
-    queryFn: async () => mockData.syncStatus as SyncStatusDto,
+    queryFn: async () => {
+      const data = (await apiClient.get(ENDPOINTS.admin.sync.status)) as SyncStatusDto;
+      return data;
+    },
     // Refetch every 60 seconds so the strip stays fresh
     refetchInterval: 60 * 1000,
   });
@@ -430,78 +249,34 @@ export function useAdminAvailabilityReports(params: AdminAvailabilityReportsQuer
   return useQuery({
     queryKey: queryKeys.admin.availabilityReports.list(params),
     queryFn: async () => {
-      try {
-        const data = (await apiClient.get(
-          ENDPOINTS.admin.availabilityReports,
-          {
-            params,
-          },
-        )) as PaginatedDto<AvailabilityReportDto>;
+      const data = (await apiClient.get(
+        ENDPOINTS.admin.availabilityReports,
+        {
+          params,
+        },
+      )) as PaginatedDto<AvailabilityReportDto>;
 
-        const normalizedRows = data.data.map(normalizeAvailabilityReportRow);
-        localAvailabilityReportRows.splice(
-          0,
-          localAvailabilityReportRows.length,
-          ...mergeRowsById(localAvailabilityReportRows, normalizedRows),
-        );
+      const normalizedRows = data.data.map(normalizeAvailabilityReportRow);
+      const searchQuery = params.query?.trim() ?? '';
 
-        const searchQuery = params.query?.trim() ?? '';
-
-        if (searchQuery.length > 0) {
-          const filteredRows = localAvailabilityReportRows.filter(function(report) {
-            if (params.resolved === 'true' && !report.resolved) {
-              return false;
-            }
-
-            if (params.resolved === 'false' && report.resolved) {
-              return false;
-            }
-
-            return matchSearchQuery(searchQuery, [
-              report.title,
-              report.platform,
-              report.category,
-              report.reportedBy,
-              report.resolution,
-            ]);
-          });
-
-          return paginateRows(filteredRows, params.page, params.limit);
-        }
-
-        return {
-          data: normalizedRows,
-          meta: data.meta,
-        };
-      } catch {
-        const searchQuery = params.query?.trim() ?? '';
-        const fallbackRows = localAvailabilityReportRows.filter(function(report) {
-          if (params.resolved === 'true') {
-            return report.resolved;
-          }
-
-          if (params.resolved === 'false') {
-            return !report.resolved;
-          }
-
-          return true;
+      if (searchQuery.length > 0) {
+        const filteredRows = normalizedRows.filter(function(report) {
+          return matchSearchQuery(searchQuery, [
+            report.title,
+            report.platform,
+            report.category,
+            report.reportedBy,
+            report.resolution,
+          ]);
         });
 
-        const searchedRows =
-          searchQuery.length > 0
-            ? fallbackRows.filter(function(report) {
-                return matchSearchQuery(searchQuery, [
-                  report.title,
-                  report.platform,
-                  report.category,
-                  report.reportedBy,
-                  report.resolution,
-                ]);
-              })
-            : fallbackRows;
-
-        return paginateRows(searchedRows, params.page, params.limit);
+        return paginateRows(filteredRows, params.page, params.limit);
       }
+
+      return {
+        data: normalizedRows,
+        meta: data.meta,
+      };
     },
   });
 }
@@ -512,29 +287,12 @@ export function useResolveAvailabilityReport() {
 
   return useMutation({
     mutationFn: async ({ id, resolution }: ResolveAvailabilityReportMutation) => {
-      try {
-        const data = (await apiClient.patch(
-          `${ENDPOINTS.admin.availabilityReports}/${id}/resolve`,
-          { resolution },
-        )) as AvailabilityReportDto;
+      const data = (await apiClient.patch(
+        `${ENDPOINTS.admin.availabilityReports}/${id}/resolve`,
+        { resolution },
+      )) as AvailabilityReportDto;
 
-        const normalized = normalizeAvailabilityReportRow(data);
-        updateLocalAvailabilityReportRow(id, normalized.resolution, normalized.resolvedAt);
-        return normalized;
-      } catch {
-        const resolvedAt = new Date().toISOString();
-        const updated = updateLocalAvailabilityReportRow(
-          id,
-          resolution?.trim() ? resolution.trim() : null,
-          resolvedAt,
-        );
-
-        if (!updated) {
-          throw new Error('Availability report not found in local cache.');
-        }
-
-        return updated;
-      }
+      return normalizeAvailabilityReportRow(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.availabilityReports.all });
@@ -551,60 +309,25 @@ export function useAdminUsers(params: AdminUsersQueryParams) {
   return useQuery({
     queryKey: queryKeys.admin.users.list(params),
     queryFn: async () => {
-      try {
-        const data = (await apiClient.get(ENDPOINTS.admin.users, {
-          params,
-        })) as PaginatedUsersDto;
+      const data = (await apiClient.get(ENDPOINTS.admin.users, {
+        params,
+      })) as PaginatedUsersDto;
 
-        const normalizedRows = data.data.map(normalizeUserRow);
-        localUserRows.splice(0, localUserRows.length, ...mergeRowsById(localUserRows, normalizedRows));
+      const normalizedRows = data.data.map(normalizeUserRow);
+      const searchQuery = params.query?.trim() ?? '';
 
-        const searchQuery = params.query?.trim() ?? '';
+      if (searchQuery.length > 0) {
+        const filteredRows = normalizedRows.filter(function(user) {
+          return matchSearchQuery(searchQuery, [user.name, user.email, user.id, user.role]);
+        });
 
-        if (searchQuery.length > 0) {
-          const filteredRows = localUserRows.filter(function(user) {
-            if (params.suspended === 'true' && !user.suspended) {
-              return false;
-            }
-
-            if (params.suspended === 'false' && user.suspended) {
-              return false;
-            }
-
-            return matchSearchQuery(searchQuery, [user.name, user.email, user.id, user.role]);
-          });
-
-          return paginateRows(filteredRows, params.page, params.limit);
-        }
-
-        return {
-          data: normalizedRows,
-          meta: data.meta,
-        };
-      } catch {
-        const searchQuery = params.query?.trim() ?? '';
-        const fallbackRows = localUserRows
-          .filter(function(user) {
-            if (params.suspended === 'true') {
-              return user.suspended;
-            }
-
-            if (params.suspended === 'false') {
-              return !user.suspended;
-            }
-
-            return true;
-          });
-
-        const searchedRows =
-          searchQuery.length > 0
-            ? fallbackRows.filter(function(user) {
-                return matchSearchQuery(searchQuery, [user.name, user.email, user.id, user.role]);
-              })
-            : fallbackRows;
-
-        return paginateRows(searchedRows, params.page, params.limit);
+        return paginateRows(filteredRows, params.page, params.limit);
       }
+
+      return {
+        data: normalizedRows,
+        meta: data.meta,
+      };
     },
   });
 }
@@ -615,18 +338,8 @@ export function useUpdateAdminUserRole() {
 
   return useMutation({
     mutationFn: async ({ id, role }: UpdateUserRoleMutation) => {
-      try {
-        const data = (await apiClient.patch(`${ENDPOINTS.admin.users}/${id}/role`, { role })) as AdminUserDto;
-        const normalized = normalizeUserRow(data);
-        updateLocalUserRow(id, { role: normalized.role });
-        return normalized;
-      } catch {
-        const updated = updateLocalUserRow(id, { role });
-        if (!updated) {
-          throw new Error('User not found in local cache.');
-        }
-        return updated;
-      }
+      const data = (await apiClient.patch(`${ENDPOINTS.admin.users}/${id}/role`, { role })) as AdminUserDto;
+      return normalizeUserRow(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all });
@@ -639,35 +352,14 @@ export function useSuspendAdminUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id }: SuspendUserMutation) => {
-      const currentUser = localUserRows.find(function(user) {
-        return user.id === id;
-      });
-
-      if (!currentUser) {
-        throw new Error('User not found in local cache.');
+    mutationFn: async ({ id, currentlySuspended }: SuspendUserMutation) => {
+      if (!currentlySuspended) {
+        const data = (await apiClient.patch(`${ENDPOINTS.admin.users}/${id}/suspend`)) as AdminUserDto;
+        return normalizeUserRow(data);
       }
 
-      if (!currentUser.suspended) {
-        try {
-          const data = (await apiClient.patch(`${ENDPOINTS.admin.users}/${id}/suspend`)) as AdminUserDto;
-          const normalized = normalizeUserRow(data);
-          updateLocalUserRow(id, { suspended: normalized.suspended });
-          return normalized;
-        } catch {
-          const updated = updateLocalUserRow(id, { suspended: true });
-          if (!updated) {
-            throw new Error('Unable to suspend this user.');
-          }
-          return updated;
-        }
-      }
-
-      const updated = updateLocalUserRow(id, { suspended: false });
-      if (!updated) {
-        throw new Error('Unable to reinstate this user.');
-      }
-      return updated;
+      const data = (await apiClient.patch(`${ENDPOINTS.admin.users}/${id}/unsuspend`)) as AdminUserDto;
+      return normalizeUserRow(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all });
@@ -685,20 +377,23 @@ export function useNeedsAttention() {
   return useQuery({
     queryKey: ['admin', 'needs-attention'] as const,
     queryFn: async () => {
-      // const [commentsRes, reportsRes] = await Promise.all([ ... ])
+      const [commentsRes, reportsRes] = await Promise.all([
+        apiClient.get(ENDPOINTS.admin.comments, { params: { limit: 10, status: 'reported' } }) as Promise<PaginatedDto<ReportedCommentDto>>,
+        apiClient.get(ENDPOINTS.admin.availabilityReports, { params: { limit: 10, resolved: 'false' } }) as Promise<PaginatedDto<AvailabilityReportDto>>,
+      ]);
 
-      const commentItems: NeedsAttentionItem[] = mockData.comments.map((c) => ({
+      const commentItems: NeedsAttentionItem[] = commentsRes.data.map((c) => ({
         id: c.id,
         source: 'comment',
-        detail: c.text,
+        detail: c.text ?? '',
         createdAt: c.createdAt,
       }));
 
-      const reportItems: NeedsAttentionItem[] = mockData.reports.map((r) => ({
+      const reportItems: NeedsAttentionItem[] = reportsRes.data.map((r) => ({
         id: r.id,
         source: 'avail. report',
-        detail: `${r.titleName} — marked unavailable on ${r.platform ?? 'unknown'}`,
-        createdAt: r.createdAt,
+        detail: `${r.titleName ?? r.title ?? 'Untitled report'} — marked unavailable on ${r.platform ?? 'unknown'}`,
+        createdAt: r.createdAt ?? r.reportedAt ?? new Date().toISOString(),
       }));
 
       return [...commentItems, ...reportItems].toSorted(
@@ -716,7 +411,10 @@ export function useNeedsAttention() {
 export function usePlatforms() {
   return useQuery({
     queryKey: queryKeys.admin.platforms.list(),
-    queryFn: async () => mockData.platforms as AdminPlatformDto[],
+    queryFn: async () => {
+      const data = (await apiClient.get(ENDPOINTS.admin.platforms.list)) as AdminPlatformDto[];
+      return data;
+    }
   });
 }
 
@@ -726,10 +424,10 @@ export function useCreatePlatform() {
 
   return useMutation({
     mutationFn: async (payload: CreatePlatformDto) => {
-      const data = await apiClient.post<AdminPlatformDto>(
+      const data = (await apiClient.post(
         ENDPOINTS.admin.platforms.list,
         payload,
-      );
+      )) as AdminPlatformDto;
       return data;
     },
     onSuccess: () => {
