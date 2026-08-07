@@ -158,7 +158,7 @@ const navGroups: NavGroup[] = [
 type RailProps = {
   adminName?: string;
   adminRole?: string;
-  badges?: Record<string, number>;
+  badges?: Record<string, number | undefined>;
   onNavClick?: () => void;
   collapsed?: boolean;
 };
@@ -167,6 +167,9 @@ export function Rail(props: RailProps) {
   const pathname = usePathname();
 
   function isActive(href: string) {
+    if (href === '/dashboard') {
+      return pathname === '/dashboard';
+    }
     return pathname.includes(href);
   }
 

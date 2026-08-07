@@ -22,7 +22,10 @@ type AdminLayoutProps = {
  * - md (768px–1023px): collapsed sidebar, icons only
  * - < sm (640px): sidebar hidden, hamburger in header opens a drawer
  */
-export function AdminLayout(props: AdminLayoutProps) {
+import { Suspense } from 'react';
+import { AdminSearchFallbackProvider, AdminSearchProvider } from '@/hooks/useAdminSearch';
+
+function AdminLayoutShell(props: AdminLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -128,5 +131,21 @@ export function AdminLayout(props: AdminLayoutProps) {
         </div>
       </main>
     </div>
+  );
+}
+
+export function AdminLayout(props: AdminLayoutProps) {
+  return (
+    <Suspense
+      fallback={(
+        <AdminSearchFallbackProvider>
+          <AdminLayoutShell {...props} />
+        </AdminSearchFallbackProvider>
+      )}
+    >
+      <AdminSearchProvider>
+        <AdminLayoutShell {...props} />
+      </AdminSearchProvider>
+    </Suspense>
   );
 }

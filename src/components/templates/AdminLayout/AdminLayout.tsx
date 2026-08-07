@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { Rail } from '@/components/organisms/Rail';
 import { SyncPulseStrip } from '@/components/organisms/SyncPulseStrip';
 import { Topbar } from '@/components/organisms/Topbar';
-import { getAvailabilityReportCounts, getCommentQueueCounts } from '@/data/admin-moderation';
+import { useAdminStats } from '@/features/admin/api';
 import { AdminSearchFallbackProvider, AdminSearchProvider } from '@/hooks/useAdminSearch';
 
 type AdminLayoutProps = {
@@ -36,9 +36,11 @@ function AdminLayoutShell(props: AdminLayoutProps) {
     };
   }, []);
 
+  const statsQuery = useAdminStats();
+
   const badges = {
-    comments: getCommentQueueCounts().reported,
-    reports: getAvailabilityReportCounts().unresolved,
+    comments: statsQuery.data?.pendingComments,
+    reports: statsQuery.data?.pendingReports,
   };
 
   return (

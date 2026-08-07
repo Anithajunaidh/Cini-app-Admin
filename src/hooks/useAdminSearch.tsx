@@ -13,6 +13,7 @@ import { usePathname } from '@/libs/I18nNavigation';
 
 type AdminSearchContextValue = {
   query: string;
+  debouncedQuery: string;
   setQuery: (value: string) => void;
 };
 
@@ -26,7 +27,7 @@ export function AdminSearchFallbackProvider(props: { children: ReactNode }) {
   const [query, setQuery] = useState('');
 
   return (
-    <AdminSearchContext.Provider value={{ query, setQuery }}>
+    <AdminSearchContext.Provider value={{ query, debouncedQuery: query, setQuery }}>
       {props.children}
     </AdminSearchContext.Provider>
   );
@@ -83,7 +84,7 @@ export function AdminSearchProvider(props: { children: ReactNode }) {
   }, [debouncedQuery, pathname]);
 
   return (
-    <AdminSearchContext.Provider value={{ query, setQuery }}>
+    <AdminSearchContext.Provider value={{ query, debouncedQuery, setQuery }}>
       {props.children}
     </AdminSearchContext.Provider>
   );
@@ -115,4 +116,18 @@ export function useAdminSearch() {
   }
 
   return context;
+}
+
+/**
+ * Reads the debounced admin search query used for table filtering.
+ * @returns Debounced query string.
+ */
+export function useAdminDebouncedSearchQuery() {
+  const context = useContext(AdminSearchContext);
+
+  if (!context) {
+    throw new Error('useAdminDebouncedSearchQuery must be used within AdminSearchProvider');
+  }
+
+  return context.debouncedQuery;
 }

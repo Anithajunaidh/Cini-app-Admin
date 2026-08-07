@@ -1,25 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/atoms/Badge';
 import { EmptyState } from '@/components/atoms/EmptyState';
 import { Pagination } from '@/components/atoms/Pagination';
 import { AdminLayout } from '@/components/templates/AdminLayout';
-import {
-  adminCommentQueue,
-  filterCommentQueueRows,
-  type AdminComment,
-  type CommentFilter,
-} from '@/data/admin-moderation';
-import { useAdminSearchQuery } from '@/hooks/useAdminSearch';
+import { useAdminComments, useSetCommentHidden } from '@/features/admin/api';
+import { useAdminDebouncedSearchQuery } from '@/hooks/useAdminSearch';
 
-const FILTER_TABS: { label: string; value: CommentFilter }[] = [
-  { label: 'Reported', value: 'reported' },
-  { label: 'Hidden', value: 'hidden' },
-  { label: 'All', value: 'all' },
-];
-
-const LIMIT = 5;
+import { COMMENT_FILTER_TABS, COMMENTS_PAGE_LIMIT, type CommentFilter } from '@/constants/admin.constants';
 
 function formatRelativeAge(value: string) {
   const diffMs = Date.now() - new Date(value).getTime();
@@ -40,6 +30,14 @@ function formatRelativeAge(value: string) {
   return `${diffDays}d`;
 }
 
+function getCommentErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
+  return 'Something went wrong while updating this comment.';
+}
+
 export default function CommentQueuePage() {
   return (
     <AdminLayout eyebrow="Moderation" title="Comment queue">
@@ -49,16 +47,22 @@ export default function CommentQueuePage() {
 }
 
 function CommentQueuePanel() {
-  const [comments, setComments] = useState<AdminComment[]>(adminCommentQueue);
   const [activeFilter, setActiveFilter] = useState<CommentFilter>('reported');
   const [page, setPage] = useState(1);
-  const searchQuery = useAdminSearchQuery();
+  const [actionError, setActionError] = useState<string | null>(null);
+  const searchQuery = useAdminDebouncedSearchQuery();
+  const commentsQuery = useAdminComments({
+    page,
+    limit: COMMENTS_PAGE_LIMIT,
+    status: activeFilter,
+    query: searchQuery,
+  });
+  const setCommentHidden = useSetCommentHidden();
 
-  const filteredComments = filterCommentQueueRows(comments, activeFilter, searchQuery);
-  const total = filteredComments.length;
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const total = commentsQuery.data?.meta.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / COMMENTS_PAGE_LIMIT));
   const safePage = Math.min(Math.max(page, 1), totalPages);
-  const pageRows = filteredComments.slice((safePage - 1) * LIMIT, safePage * LIMIT);
+  const pageRows = commentsQuery.data?.data ?? [];
 
   const countCaption =
     activeFilter === 'reported'
@@ -66,26 +70,52 @@ function CommentQueuePanel() {
       : activeFilter === 'hidden'
         ? `${total} hidden`
         : `${total} total`;
-  const hasSearchQuery = searchQuery.trim().length > 0;
+
+  useEffect(
+    function() {
+      if (page > totalPages) {
+        setPage(totalPages);
+      }
+    },
+    [page, totalPages],
+  );
+
+  useEffect(
+    function() {
+      setPage(1);
+    },
+    [searchQuery, activeFilter],
+  );
 
   function handleFilterChange(filter: CommentFilter) {
     setActiveFilter(filter);
     setPage(1);
+    setActionError(null);
   }
 
-  function handleToggleHidden(commentId: string) {
-    setComments(function(previousComments) {
-      return previousComments.map(function(comment) {
-        if (comment.id !== commentId) {
-          return comment;
-        }
+  function handleToggleHidden(commentId: string, hidden: boolean) {
+    setActionError(null);
 
-        return {
-          ...comment,
-          hidden: !comment.hidden,
-        };
-      });
-    });
+    setCommentHidden.mutate(
+      { id: commentId, hidden },
+      {
+        onError(error) {
+          setActionError(getCommentErrorMessage(error));
+        },
+      },
+    );
+  }
+
+  if (commentsQuery.isError) {
+    return (
+      <div className="panel">
+        <div className="px-[18px] py-[20px] text-[13px] text-[color:var(--accent-red)]">
+          {commentsQuery.error instanceof ApiError
+            ? commentsQuery.error.message
+            : 'Unable to load the comment queue.'}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -93,11 +123,13 @@ function CommentQueuePanel() {
       <div className="panel-head">
         <div className="panel-heading">
           <span className="panel-title">Comment queue</span>
-          <span className="panel-count">{countCaption}</span>
+          <span className="panel-count">
+            {commentsQuery.isLoading ? 'Loading…' : countCaption}
+          </span>
         </div>
 
         <div className="filter-row">
-          {FILTER_TABS.map(function(tab) {
+          {COMMENT_FILTER_TABS.map(function(tab) {
             return (
               <button
                 key={tab.value}
@@ -115,15 +147,26 @@ function CommentQueuePanel() {
         </div>
       </div>
 
-      {pageRows.length === 0 ? (
+      {actionError ? (
+        <div className="border-b border-[color:var(--border-soft)] px-[18px] py-[12px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--accent-red)]">
+          {actionError}
+        </div>
+      ) : null}
+
+      {commentsQuery.isLoading ? (
+        <div className="px-[18px] py-[24px] font-[family:var(--font-mono)] text-[12px] text-[color:var(--text-faint)]">
+          Loading comments…
+        </div>
+      ) : pageRows.length === 0 ? (
         <EmptyState
           title="No comments found"
-          subtitle={hasSearchQuery ? 'No comments match this search.' : 'There are no comments for this filter.'}
+          subtitle="There are no comments for this filter."
         />
       ) : (
         <>
-          <table>
-            <thead>
+          <div className="overflow-x-auto w-full">
+            <table>
+              <thead>
               <tr>
                 <th>Comment</th>
                 <th>Author</th>
@@ -142,22 +185,25 @@ function CommentQueuePanel() {
                         id: {comment.id}
                         {comment.hidden ? (
                           <>
-                            {' · '}
+                            {' Â· '}
                             <Badge variant="hidden">hidden</Badge>
                           </>
                         ) : null}
                       </div>
                     </td>
                     <td className="cell-mono">{comment.userId}</td>
-                    <td>{comment.titleName ?? comment.titleId}</td>
-                    <td className="cell-mono">{formatRelativeAge(comment.reportedAt ?? comment.createdAt)}</td>
+                    <td>{comment.titleName ?? comment.titleId ?? '—'}</td>
+                    <td className="cell-mono">
+                      {formatRelativeAge(comment.reportedAt ?? comment.createdAt)}
+                    </td>
                     <td>
                       <div className="row-actions">
                         <button
                           suppressHydrationWarning
                           className={`btn-ghost${comment.hidden ? '' : ' danger'}`}
+                          disabled={setCommentHidden.isPending}
                           onClick={function() {
-                            handleToggleHidden(comment.id);
+                            handleToggleHidden(comment.id, !comment.hidden);
                           }}
                           type="button"
                         >
@@ -169,9 +215,10 @@ function CommentQueuePanel() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
 
-          <Pagination page={safePage} totalPages={totalPages} limit={LIMIT} onPageChange={setPage} />
+          <Pagination page={safePage} totalPages={totalPages} limit={COMMENTS_PAGE_LIMIT} onPageChange={setPage} />
         </>
       )}
     </div>

@@ -21,7 +21,7 @@ const aj = arcjet.withRule(
   }),
 );
 
-export default async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Verify the request with Arcjet
   // Use `process.env` instead of Env to reduce bundle size in middleware
   if (process.env.ARCJET_KEY) {
@@ -32,7 +32,10 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Let local development bypass auth checks so the dashboard can be verified directly.
+  // Sample Sign-in flow: check if the user has the dummy access_token cookie
+  // Since localStorage is client-side, we'll just check if they are visiting a dashboard route
+  // and redirect them if they haven't set a cookie (which the client can't easily do).
+  // Actually, for simplicity of this dummy flow, we will let the client handle it.
   if (process.env.NODE_ENV === 'development') {
     return handleI18nRouting(request);
   }
