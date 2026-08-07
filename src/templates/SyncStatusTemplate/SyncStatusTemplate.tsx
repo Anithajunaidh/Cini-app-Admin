@@ -6,26 +6,35 @@ import { EmptyState } from '@/components/molecules/EmptyState';
 import { Panel } from '@/components/organisms/Panel';
 import { SyncCard } from '@/components/organisms/SyncCard';
 import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
+import { TMDB_SYNC_HEALTH_THRESHOLD_MS, AVAIL_SYNC_HEALTH_THRESHOLD_MS } from '@/constants/app';
 
-// Helpers — mirrored from SyncPulseStrip so both stay in sync
+// Helpers — use shared thresholds from constants so SyncPulseStrip stays in sync
 
 function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
-  if (!isoString) {return 'amber';}
+  if (!isoString) {
+    return 'amber';
+  }
   const ageMs = Date.now() - new Date(isoString).getTime();
-  return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < TMDB_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
-  if (epochSeconds == null) {return 'amber';}
+  if (epochSeconds == null) {
+    return 'amber';
+  }
   const ageMs = Date.now() - epochSeconds * 1000;
-  return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < AVAIL_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function formatRelative(ms: number): string {
   const min = Math.floor(ms / 60_000);
-  if (min < 60) {return `${min}m ago`;}
+  if (min < 60) {
+    return `${min}m ago`;
+  }
   const hr = Math.floor(min / 60);
-  if (hr < 24) {return `${hr}h ago`;}
+  if (hr < 24) {
+    return `${hr}h ago`;
+  }
   return `${Math.floor(hr / 24)}d ago`;
 }
 
@@ -44,7 +53,7 @@ const statusVariant = {
 
 /** Sync Status page layout -- two detail cards + session trigger history. */
 export function SyncStatusTemplate() {
-  const { data: syncStatus, isLoading } = useAdminSyncStatus();
+  const { data: syncStatus, isLoading, isError } = useAdminSyncStatus();
   const triggerSync = useTriggerSync();
   const [history, setHistory] = useState<TriggerHistoryEntry[]>([]);
 
@@ -52,12 +61,12 @@ export function SyncStatusTemplate() {
 
   const tmdbTimestamp = syncStatus?.lastTmdbSync
     ? `${syncStatus.lastTmdbSync} · ${formatRelative(now - new Date(syncStatus.lastTmdbSync).getTime())}`
-    : '—';
+    : 'never synced';
 
   const availTimestamp =
-    syncStatus?.lastAvailSync != null
-      ? `epoch ${syncStatus.lastAvailSync} · ${formatRelative(now - syncStatus.lastAvailSync * 1000)}`
-      : '—';
+    syncStatus?.lastAvailabilitySync != null
+      ? `${new Date(syncStatus.lastAvailabilitySync * 1000).toISOString()} · ${formatRelative(now - syncStatus.lastAvailabilitySync * 1000)}`
+      : 'never synced';
 
   function handleTrigger(target: 'tmdb' | 'availability') {
     // Add to session history OPTIMISTICALLY on click.
@@ -72,7 +81,17 @@ export function SyncStatusTemplate() {
   }
 
   const tmdbColor = isLoading ? 'amber' : tmdbSyncColor(syncStatus?.lastTmdbSync ?? null);
-  const availColor = isLoading ? 'amber' : availSyncColor(syncStatus?.lastAvailSync ?? null);
+  const availColor = isLoading ? 'amber' : availSyncColor(syncStatus?.lastAvailabilitySync ?? null);
+
+  // Error state — API unreachable or returned 404 (sync job not found)
+  if (isError) {
+    return (
+      <EmptyState
+        title="Sync data unavailable"
+        sub="Could not load sync status. The sync job may not have run yet or the API is unreachable."
+      />
+    );
+  }
 
   // Skeleton
   if (isLoading) {
@@ -130,7 +149,7 @@ export function SyncStatusTemplate() {
         <SyncCard
           name="Availability sync"
           redisKey="last-avail-sync"
-          timestamp={syncStatus?.lastAvailSync != null ? availTimestamp : '—'}
+          timestamp={syncStatus?.lastAvailabilitySync != null ? availTimestamp : '—'}
           workerLabel="Writer: AvailabilityWorker · unix epoch seconds"
           color={availColor}
           triggerLabel="Trigger availability sync"

@@ -9,17 +9,14 @@ export const ENDPOINTS = {
     list: '/users',
   },
   admin: {
-    stats: '/api/v1/admin/stats',
+    stats: '/admin/stats',
     sync: {
-      status: '/api/v1/admin/sync/status',
-      trigger: '/api/v1/admin/sync/trigger',
+      status: '/admin/sync/status',
+      trigger: '/admin/sync/trigger',
     },
-    comments: '/api/v1/admin/comments',
-    availabilityReports: '/api/v1/admin/availability-reports',
     platforms: {
-      list: '/api/v1/admin/platforms',
-      detail: (id: string) => `/api/v1/admin/platforms/${id}`,
+      list: '/admin/platforms',
+      detail: (id: string) => `/admin/platforms/${id}`,
     },
-    users: '/api/v1/admin/users',
   },
 } as const;

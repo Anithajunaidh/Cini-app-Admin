@@ -15,7 +15,7 @@ export function PlatformCard(props: PlatformCardProps) {
       <div className="flex items-center justify-between">
         <div className="min-w-0">
           <div className="truncate font-[family-name:var(--font-display)] text-[15px] font-semibold">
-            {platform.name}
+            {platform.nameEs}
           </div>
           <div className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--text-faint)]">
             {platform.slug}
@@ -33,14 +33,6 @@ export function PlatformCard(props: PlatformCardProps) {
           </div>
           <div className="font-[family-name:var(--font-mono)] text-[10.5px] tracking-[0.4px] text-[var(--text-faint)] uppercase">
             Subscribers
-          </div>
-        </div>
-        <div>
-          <div className="font-[family-name:var(--font-mono)] text-[16px] font-semibold">
-            {platform.titleCount.toLocaleString()}
-          </div>
-          <div className="font-[family-name:var(--font-mono)] text-[10.5px] tracking-[0.4px] text-[var(--text-faint)] uppercase">
-            Titles
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ type AddPlatformModalProps = {
 export function AddPlatformModal(props: AddPlatformModalProps) {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
+  const [type, setType] = useState<'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR'>('SVOD');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const createPlatform = useCreatePlatform();
 
@@ -26,7 +27,7 @@ export function AddPlatformModal(props: AddPlatformModalProps) {
     }
 
     createPlatform.mutate(
-      { name: name.trim(), slug: slug.trim() },
+      { nameEs: name.trim(), slug: slug.trim(), type },
       {
         onSuccess: () => {
           props.onClose();
@@ -115,6 +116,28 @@ export function AddPlatformModal(props: AddPlatformModalProps) {
               placeholder="e.g. prime-video"
               className="rounded-[8px] border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 font-[family-name:var(--font-mono)] text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent-teal)] focus:outline-none"
             />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="platform-type"
+              className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.6px] text-[var(--text-faint)] uppercase"
+            >
+              Type
+            </label>
+            <select
+              id="platform-type"
+              value={type}
+              onChange={(e) => {
+                setType(e.target.value as 'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR');
+              }}
+              className="rounded-[8px] border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-2 font-[family-name:var(--font-mono)] text-[13px] text-[var(--text-primary)] focus:border-[var(--accent-teal)] focus:outline-none"
+            >
+              <option value="SVOD">SVOD (Subscription)</option>
+              <option value="TVOD">TVOD (Rental/Buy)</option>
+              <option value="AVOD">AVOD (Ad-supported)</option>
+              <option value="LINEAR">Linear TV</option>
+            </select>
           </div>
 
           {errorMessage && (

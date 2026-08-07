@@ -21,6 +21,14 @@ const baseConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/': ['./migrations/**/*'],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://cineapp-backend.innogenio.com'}/api/:path*`,
+      },
+    ];
+  },
 };
 
 // Initialize the Next-Intl plugin

@@ -2,12 +2,11 @@
 
 import { StatCard } from '@/components/molecules/StatCard';
 import { useAdminStats } from '@/features/admin/api';
-
-const STAT_SKELETON_COUNT = 5;
+import { STAT_SKELETON_COUNT } from '@/constants/app';
 
 /** Renders the 5 stat cards in the Dashboard stats grid. Fetches from GET /admin/stats. */
 export function StatGrid() {
-  const { data: stats, isLoading } = useAdminStats();
+  const { data: stats, isLoading, isError } = useAdminStats();
 
   if (isLoading) {
     return (
@@ -23,6 +22,17 @@ export function StatGrid() {
             <div className="h-[11px] w-32 rounded bg-[var(--surface-raised)]" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-[var(--radius)] border border-[var(--accent-red-dim)] bg-[var(--surface)] px-4 py-3">
+        <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--accent-red)]">
+          ⚠ Could not load stats — backend may be unreachable or the /admin/stats endpoint returned
+          an error.
+        </p>
       </div>
     );
   }

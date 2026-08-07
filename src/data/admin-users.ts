@@ -5,14 +5,14 @@ export type AdminUserRole = 'USER' | 'MODERATOR' | 'ADMIN';
 
 export type UsersFilter = 'all' | 'suspended';
 
-export interface AdminUser {
+export type AdminUser = {
   id: string;
   name: string;
   email: string;
   role: AdminUserRole;
   suspended: boolean;
   joinedAt: string;
-}
+};
 
 /** Logged-in admin id used for own-row safeguards on the Users page. */
 export const CURRENT_ADMIN_ID = 'u_0001';
@@ -29,7 +29,7 @@ export const adminUsers = adminUsersData as AdminUser[];
  * @returns Filtered users in source order.
  */
 export function filterAdminUsers(rows: AdminUser[], filter: UsersFilter, query = '') {
-  return rows.filter(function(user) {
+  return rows.filter(function (user) {
     if (filter === 'suspended' && !user.suspended) {
       return false;
     }

@@ -2,6 +2,7 @@
 
 import { PulseCell } from '@/components/molecules/PulseCell';
 import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
+import { TMDB_SYNC_HEALTH_THRESHOLD_MS, AVAIL_SYNC_HEALTH_THRESHOLD_MS } from '@/constants/app';
 
 /**
  * Determines sync dot color:
@@ -13,7 +14,7 @@ function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
     return 'amber';
   }
   const ageMs = Date.now() - new Date(isoString).getTime();
-  return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < TMDB_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
@@ -21,7 +22,7 @@ function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
     return 'amber';
   }
   const ageMs = Date.now() - epochSeconds * 1000;
-  return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < AVAIL_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function formatRelativeTime(ms: number): string {
@@ -43,12 +44,12 @@ export function SyncPulseStrip() {
 
   const tmdbValue = syncStatus?.lastTmdbSync
     ? `${syncStatus.lastTmdbSync} · ${formatRelativeTime(Date.now() - new Date(syncStatus.lastTmdbSync).getTime())}`
-    : '—';
+    : (syncStatus ? 'never synced' : '—');
 
   const availValue =
-    syncStatus?.lastAvailSync != null
-      ? `epoch ${syncStatus.lastAvailSync} · ${formatRelativeTime(Date.now() - syncStatus.lastAvailSync * 1000)}`
-      : '—';
+    syncStatus?.lastAvailabilitySync != null
+      ? `${new Date(syncStatus.lastAvailabilitySync * 1000).toISOString()} · ${formatRelativeTime(Date.now() - syncStatus.lastAvailabilitySync * 1000)}`
+      : (syncStatus ? 'never synced' : '—');
 
   function handleTriggerSync() {
     // Trigger both syncs immediately (targets both since the strip button is generic)
@@ -68,7 +69,7 @@ export function SyncPulseStrip() {
         <PulseCell
           title="last-avail-sync"
           value={availValue}
-          color={availSyncColor(syncStatus?.lastAvailSync ?? null)}
+          color={availSyncColor(syncStatus?.lastAvailabilitySync ?? null)}
         />
       </div>
 

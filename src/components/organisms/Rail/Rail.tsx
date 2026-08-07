@@ -1,7 +1,7 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { Link } from '@/libs/I18nNavigation';
 
 type NavItem = {
@@ -167,6 +167,9 @@ export function Rail(props: RailProps) {
   const pathname = usePathname();
 
   function isActive(href: string) {
+    if (href === '/dashboard') {
+      return pathname.endsWith('/dashboard') || pathname === href;
+    }
     return pathname.includes(href);
   }
 
@@ -207,7 +210,7 @@ export function Rail(props: RailProps) {
                 >
                   <span className="shrink-0 opacity-90 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
                   {badge !== undefined ? (
-                    <span className="absolute -right-[3px] -top-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
+                    <span className="absolute -top-[3px] -right-[3px] flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[var(--accent-amber)] font-[family-name:var(--font-mono)] text-[8px] font-semibold text-[#06231F]">
                       {badge > 9 ? '9+' : badge}
                     </span>
                   ) : null}
@@ -239,7 +242,7 @@ export function Rail(props: RailProps) {
           <div className="font-[family-name:var(--font-display)] text-[15px] font-semibold tracking-[0.2px]">
             MIRALO
           </div>
-          <div className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.6px] text-[var(--text-faint)]">
+          <div className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.6px] text-[var(--text-faint)] uppercase">
             Backoffice
           </div>
         </div>
@@ -248,7 +251,7 @@ export function Rail(props: RailProps) {
       <nav className="flex flex-col gap-[2px]" aria-label="Main navigation">
         {navGroups.map((group) => (
           <div key={group.eyebrow}>
-            <div className="px-[10px] pb-[6px] pt-[14px] font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[1.2px] text-[var(--text-faint)]">
+            <div className="px-[10px] pt-[14px] pb-[6px] font-[family-name:var(--font-mono)] text-[10px] tracking-[1.2px] text-[var(--text-faint)] uppercase">
               {group.eyebrow}
             </div>
             {group.items.map((item) => {

@@ -8,7 +8,7 @@ import { usePlatforms } from '@/features/admin/api';
 
 /** 3-column responsive grid of PlatformCards + dashed add card. */
 export function PlatformGrid() {
-  const { data: platforms = [], isLoading } = usePlatforms();
+  const { data: platforms = [], isLoading, isError, error } = usePlatforms();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (isLoading) {
@@ -21,6 +21,17 @@ export function PlatformGrid() {
             className="h-[130px] animate-pulse rounded-[var(--radius)] border border-[var(--border-soft)] bg-[var(--surface)] p-4"
           />
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-[var(--radius)] border border-[var(--accent-red-dim)] bg-[var(--surface)] px-4 py-3">
+        <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--accent-red)]">
+          ⚠ Platforms API error —{' '}
+          {error?.message ?? 'Could not fetch platforms. Is the backend running?'}
+        </p>
       </div>
     );
   }

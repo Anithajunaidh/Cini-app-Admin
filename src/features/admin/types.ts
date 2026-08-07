@@ -7,46 +7,11 @@ export type AdminStatsDto = {
   pendingReports: number;
 };
 
-/** Source type for needs-attention items */
-export type NeedsAttentionSource = 'comment' | 'avail. report' | 'user';
-
-/** A single row in the Dashboard "Needs attention" panel */
-export type NeedsAttentionItem = {
-  id: string;
-  source: NeedsAttentionSource;
-  detail: string;
-  /** ISO date string for sorting/display */
-  createdAt: string;
-};
-
-/** Raw reported comment from GET /api/v1/admin/comments */
-export type ReportedCommentDto = {
-  id: string;
-  text: string;
-  title: string;
-  authorId: string;
-  hidden: boolean;
-  createdAt: string;
-};
-
-/** Raw availability report from GET /api/v1/admin/availability-reports */
-export type AvailabilityReportDto = {
-  id: string;
-  titleName: string;
-  platform: string | null;
-  category: string;
-  reportedBy: string;
-  resolvedAt: string | null;
-  resolution: string | null;
-  createdAt: string;
-};
-
-/** Sync status shape from GET /api/v1/admin/sync/status */
 export type SyncStatusDto = {
   /** ISO 8601 string */
   lastTmdbSync: string | null;
   /** Unix epoch seconds */
-  lastAvailSync: number | null;
+  lastAvailabilitySync: number | null;
 };
 
 /** Trigger sync response: 202 */
@@ -55,23 +20,21 @@ export type SyncTriggerResponseDto = {
   triggeredAt: string;
 };
 
-/** DTO for a single platform */
 export type AdminPlatformDto = {
   id: string;
-  name: string;
+  nameEs: string;
   slug: string;
   subscriberCount: number;
-  titleCount: number;
 };
 
-/** Payload for creating a new platform */
 export type CreatePlatformDto = {
-  name: string;
+  nameEs: string;
   slug: string;
+  type: 'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR';
 };
 
-/** Payload for updating a platform */
 export type UpdatePlatformDto = {
-  name?: string;
+  nameEs?: string;
   slug?: string;
+  type?: 'SVOD' | 'TVOD' | 'AVOD' | 'LINEAR';
 };
