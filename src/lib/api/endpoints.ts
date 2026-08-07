@@ -14,12 +14,9 @@ export const ENDPOINTS = {
       status: '/admin/sync/status',
       trigger: '/admin/sync/trigger',
     },
-    comments: '/admin/comments',
-    availabilityReports: '/admin/availability-reports',
     platforms: {
       list: '/admin/platforms',
       detail: (id: string) => `/admin/platforms/${id}`,
     },
-    users: '/admin/users',
   },
 } as const;

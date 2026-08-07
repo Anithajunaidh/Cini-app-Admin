@@ -95,7 +95,9 @@ export default function SignInPage() {
               required
               autoComplete="email"
               value={email}
-              onChange={(e) =>{  setEmail(e.target.value); }}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
               placeholder="admin@example.com"
               style={{
                 background: 'var(--surface-raised)',
@@ -137,7 +139,9 @@ export default function SignInPage() {
               required
               autoComplete="current-password"
               value={password}
-              onChange={(e) =>{  setPassword(e.target.value); }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               placeholder="••••••••"
               style={{
                 background: 'var(--surface-raised)',

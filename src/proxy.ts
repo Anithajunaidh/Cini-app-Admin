@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import arcjet from '@/libs/Arcjet';
 import { routing } from './libs/I18nRouting';
+import { PROTECTED_ROUTE_SEGMENTS, ACCESS_TOKEN_KEY, SIGN_IN_PATH } from './constants/app';
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -21,16 +22,11 @@ const aj = arcjet.withRule(
   }),
 );
 
-/**
- * Pathname segments that require an authenticated session.
- * Checked after stripping the locale prefix (e.g. /en/dashboard → /dashboard).
- */
-const PROTECTED_SEGMENTS = ['/dashboard', '/platforms', '/sync', '/users', '/comments', '/reports'];
 
 function isProtectedPath(pathname: string): boolean {
   // Strip locale prefix: /en/dashboard → /dashboard
   const withoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '') || '/';
-  return PROTECTED_SEGMENTS.some(
+  return PROTECTED_ROUTE_SEGMENTS.some(
     (seg) => withoutLocale === seg || withoutLocale.startsWith(`${seg}/`),
   );
 }
@@ -51,10 +47,10 @@ export default async function proxy(request: NextRequest) {
   // Route guard — only enforced in production.
   // In development, the dashboard can be accessed directly to speed up iteration.
   if (process.env.NODE_ENV !== 'development' && isProtectedPath(pathname)) {
-    const token = request.cookies.get('access_token')?.value;
+    const token = request.cookies.get(ACCESS_TOKEN_KEY)?.value;
     if (!token) {
       const signInUrl = request.nextUrl.clone();
-      signInUrl.pathname = '/sign-in';
+      signInUrl.pathname = SIGN_IN_PATH;
       return NextResponse.redirect(signInUrl);
     }
   }

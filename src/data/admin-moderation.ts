@@ -12,7 +12,7 @@ export type AdminComment = {
   titleName?: string;
   createdAt: string;
   reportedAt?: string;
-}
+};
 
 export type AdminAvailabilityReport = {
   id: string;
@@ -24,7 +24,7 @@ export type AdminAvailabilityReport = {
   resolved: boolean;
   resolution: string | null;
   resolvedAt: string | null;
-}
+};
 
 export type CommentFilter = 'reported' | 'hidden' | 'all';
 export type AvailabilityFilter = 'unresolved' | 'resolved' | 'all';

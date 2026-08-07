@@ -6,15 +6,16 @@ import { EmptyState } from '@/components/molecules/EmptyState';
 import { Panel } from '@/components/organisms/Panel';
 import { SyncCard } from '@/components/organisms/SyncCard';
 import { useAdminSyncStatus, useTriggerSync } from '@/features/admin/api';
+import { TMDB_SYNC_HEALTH_THRESHOLD_MS, AVAIL_SYNC_HEALTH_THRESHOLD_MS } from '@/constants/app';
 
-// Helpers — mirrored from SyncPulseStrip so both stay in sync
+// Helpers — use shared thresholds from constants so SyncPulseStrip stays in sync
 
 function tmdbSyncColor(isoString: string | null): 'teal' | 'amber' {
   if (!isoString) {
     return 'amber';
   }
   const ageMs = Date.now() - new Date(isoString).getTime();
-  return ageMs < 6 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < TMDB_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
@@ -22,7 +23,7 @@ function availSyncColor(epochSeconds: number | null): 'teal' | 'amber' {
     return 'amber';
   }
   const ageMs = Date.now() - epochSeconds * 1000;
-  return ageMs < 24 * 60 * 60 * 1000 ? 'teal' : 'amber';
+  return ageMs < AVAIL_SYNC_HEALTH_THRESHOLD_MS ? 'teal' : 'amber';
 }
 
 function formatRelative(ms: number): string {
@@ -60,12 +61,12 @@ export function SyncStatusTemplate() {
 
   const tmdbTimestamp = syncStatus?.lastTmdbSync
     ? `${syncStatus.lastTmdbSync} · ${formatRelative(now - new Date(syncStatus.lastTmdbSync).getTime())}`
-    : '—';
+    : 'never synced';
 
   const availTimestamp =
     syncStatus?.lastAvailabilitySync != null
-      ? `epoch ${syncStatus.lastAvailabilitySync} · ${formatRelative(now - syncStatus.lastAvailabilitySync * 1000)}`
-      : '—';
+      ? `${new Date(syncStatus.lastAvailabilitySync * 1000).toISOString()} · ${formatRelative(now - syncStatus.lastAvailabilitySync * 1000)}`
+      : 'never synced';
 
   function handleTrigger(target: 'tmdb' | 'availability') {
     // Add to session history OPTIMISTICALLY on click.

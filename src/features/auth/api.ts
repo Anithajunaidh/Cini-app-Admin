@@ -3,61 +3,74 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { LoginDto } from './types';
+import { ACCESS_TOKEN_KEY, AUTH_SIGN_IN_PATH, DASHBOARD_PATH } from '@/constants/api';
 
-/** Stores the access token in both localStorage (for apiClient) and a cookie (for middleware). */
+/**
+ * Stores the Better Auth bearer token in localStorage so apiClient can
+ * inject it as `Authorization: Bearer <token>` on every subsequent request.
+ * Also sets a cookie so Next.js middleware can detect an authenticated session.
+ */
 function storeToken(token: string) {
-  if (typeof window === 'undefined') {return;}
-  localStorage.setItem('access_token', token);
-  document.cookie = `access_token=${token}; path=/; SameSite=Lax`;
+  if (typeof window === 'undefined') {
+    return;
+  }
+  localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  document.cookie = `${ACCESS_TOKEN_KEY}=${token}; path=/; SameSite=Lax`;
 }
 
 /** Clears all stored auth tokens from localStorage and cookies. */
 export function clearTokens() {
-  if (typeof window === 'undefined') {return;}
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  document.cookie = 'access_token=; path=/; max-age=0';
+  if (typeof window === 'undefined') {
+    return;
+  }
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  document.cookie = `${ACCESS_TOKEN_KEY}=; path=/; max-age=0`;
 }
 
 /**
  * Mutation hook for POST /api/auth/sign-in/email (Better Auth).
+ *
+ * Better Auth returns `{ token, user }` in the JSON body. The token is stored
+ * in localStorage and forwarded as `Authorization: Bearer <token>` by apiClient.
  */
 export function useLogin() {
   const router = useRouter();
 
   return useMutation({
     mutationFn: async (payload: LoginDto) => {
-      // With Next.js rewrites, this requests /api/auth/sign-in/email
-      // on the frontend server, which proxies to the backend.
-      // Better Auth natively sets the `better-auth.session_token` cookie.
-      const res = await fetch('/api/auth/sign-in/email', {
+      // Next.js rewrites /api/auth/* → backend /api/auth/*
+      const res = await fetch(AUTH_SIGN_IN_PATH, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
 
       if (!res.ok) {
         let message = 'Invalid email or password.';
         try {
           const body = (await res.json()) as { message?: string };
-          if (body.message) ({ message } = body);
+          if (body.message) {
+            ({ message } = body);
+          }
         } catch {
           // ignore parse errors
         }
         throw new Error(message);
       }
 
-      // We still need to manually set `access_token` so Next.js middleware
-      // can read it in `src/proxy.ts` without knowing better-auth's internal cookie name.
-      // We'll just set it to a dummy value so middleware knows we are authenticated.
-      // (The actual API requests rely on `better-auth.session_token` which was set automatically).
-      storeToken('authenticated');
-      return true;
+      // Better Auth returns { token, user } — store the bearer token so
+      // apiClient can attach it as Authorization: Bearer on every API request.
+      const body = (await res.json()) as { token?: string; user?: unknown };
+      if (body.token) {
+        storeToken(body.token);
+      }
+      return body;
     },
     onSuccess: () => {
-      router.push('/dashboard');
+      router.push(DASHBOARD_PATH);
     },
   });
 }
